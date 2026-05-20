@@ -936,24 +936,24 @@ function showDay(dayId, el) {
 }
 
 // ── CHECKLIST ──
-const CL_DAYS = [
-  {id:'cl0', label:'7/18 六', key:'2026-07-18'},
-  {id:'cl1', label:'7/19A 奈良', key:'7/19A租車'},
-  {id:'cl2', label:'7/19B 水樂園', key:'7/19B水樂園'},
-  {id:'cl3', label:'7/20 棒球', key:'7/20棒球'},
-  {id:'cl4', label:'7/21 USJ', key:'7/21USJ'},
-  {id:'cl5', label:'7/23 海遊館', key:'7/23海遊館'},
-  {id:'cl6', label:'7/24 天神祭', key:'7/24天神祭'},
-];
-
+let clDays = []; // 動態從 Sheets 欄位讀取
 let clData = [];
 let clChecked = JSON.parse(localStorage.getItem('clChecked') || '{}');
+
+// 固定欄位（不當天日期用）
+const CL_FIXED_COLS = ['類別','物品','說明'];
 
 async function loadChecklist() {
   try {
     const json = await fetchJsonp(API + '?action=readItems');
     if (json.ok) {
       clData = json.data;
+      // 從 headers 動態抓日期欄（排除固定欄）
+      if (json.headers) {
+        clDays = json.headers
+          .filter(h => h && !CL_FIXED_COLS.includes(h))
+          .map((h, i) => ({ id: 'cl' + i, label: h, key: h }));
+      }
       renderChecklist();
     }
   } catch(e) {
@@ -963,22 +963,26 @@ async function loadChecklist() {
 }
 
 function renderChecklist() {
-  // Selector
+  if (clDays.length === 0) {
+    document.getElementById('clContent').innerHTML =
+      '<div style="text-align:center;padding:30px;color:var(--hint);font-size:12px">無資料，請確認 Google Sheets</div>';
+    return;
+  }
+
+  // Selector — 從 Sheets 欄位動態產生
   const sel = document.getElementById('clDaySelector');
-  sel.innerHTML = CL_DAYS.map((d,i) =>
+  sel.innerHTML = clDays.map((d,i) =>
     `<div class="day-chip ${i===0?'active':''}" onclick="showClDay('${d.id}',this)">${d.label}</div>`
   ).join('');
 
   // Contents
   const content = document.getElementById('clContent');
-  content.innerHTML = CL_DAYS.map((day, di) => {
-    // Filter items that have ✓ in this day's column
+  content.innerHTML = clDays.map((day, di) => {
     const dayItems = clData.filter(row => {
       const val = row[day.key];
-      return val && String(val).includes('✓');
+      return val && String(val).trim() !== '' && String(val).includes('✓');
     });
 
-    // Group by category
     const cats = {};
     dayItems.forEach(row => {
       const cat = row['類別'] || '其他';
@@ -993,7 +997,7 @@ function renderChecklist() {
     <div class="cl-day-content ${di===0?'active':''}" id="${day.id}">
       <div class="cl-progress">
         <div class="cl-progress-label">
-          <span>今日攜帶物品</span>
+          <span>${day.label} 攜帶物品</span>
           <span id="cnt-${day.id}">${checkedCount} / ${totalItems} 件</span>
         </div>
         <div class="cl-progress-bar">
@@ -1002,7 +1006,9 @@ function renderChecklist() {
         </div>
         <button class="cl-reset-btn" onclick="resetDay('${day.key}','${day.id}')">重置今日清單</button>
       </div>
-      ${Object.entries(cats).map(([cat, items]) => `
+      ${totalItems === 0
+        ? '<div style="text-align:center;padding:20px;color:var(--hint);font-size:12px">此天無攜帶物品紀錄</div>'
+        : Object.entries(cats).map(([cat, items]) => `
         <div class="cl-category">
           <div class="cl-cat-label">${cat}</div>
           <div class="cl-card">
