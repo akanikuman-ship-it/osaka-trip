@@ -941,7 +941,7 @@ let clData = [];
 let clChecked = JSON.parse(localStorage.getItem('clChecked') || '{}');
 
 // 固定欄位（不當天日期用）
-const CL_FIXED_COLS = ['類別','物品','說明'];
+const CL_FIXED_COLS = ['類別','物品','說明','_row'];
 
 async function loadChecklist() {
   try {
@@ -980,7 +980,10 @@ function renderChecklist() {
   content.innerHTML = clDays.map((day, di) => {
     const dayItems = clData.filter(row => {
       const val = row[day.key];
-      return val && String(val).trim() !== '' && String(val).includes('✓');
+      if (!val && val !== 0) return false;
+      const s = String(val).trim();
+      // ✓ counts; pure text notes (no ✓) don't count as required item
+      return s === '✓' || s.includes('✓');
     });
 
     const cats = {};
@@ -1022,6 +1025,7 @@ function renderChecklist() {
                 <div class="cl-info">
                   <div class="cl-name ${checked?'done-text':''}">${row['物品']||''}</div>
                   ${note ? `<div class="cl-note">${note}</div>` : ''}
+                  ${(row[day.key] && String(row[day.key]).trim() !== '✓' && String(row[day.key]).includes('✓')) ? `<div class="cl-note" style="color:var(--amber)">⚠️ ${String(row[day.key]).replace('✓','').trim()}</div>` : ''}
                 </div>
               </div>`;
             }).join('')}
