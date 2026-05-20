@@ -612,12 +612,39 @@ async function pushData() {
 function getDateStr(row) {
   const d = row['日期'];
   if (!d) return '';
-  if (typeof d === 'string') return d;
-  if (d instanceof Date || (typeof d === 'object' && d !== null)) {
-    try { return new Date(d).toLocaleDateString('zh-TW',{month:'numeric',day:'numeric'}).replace('/','/'); }
-    catch(e) { return String(d); }
+  if (typeof d === 'string') {
+    // Handle ISO format: 2026-07-18T07:00:00.000Z
+    if (d.includes('T')) {
+      const dt = new Date(d);
+      // Use UTC+8 (JST/TST)
+      const m = dt.getUTCMonth() + 1;
+      const day = dt.getUTCDate();
+      // If time offset makes it cross day boundary, adjust
+      const h = dt.getUTCHours();
+      const adjusted = new Date(dt.getTime() + 7*3600000); // +7 to get ~JST
+      return (adjusted.getUTCMonth()+1) + '月' + adjusted.getUTCDate() + '日';
+    }
+    return d;
   }
   return String(d);
+}
+
+function fixTime(val) {
+  if (!val) return '';
+  if (typeof val === 'string') {
+    // Already formatted like 08:00-17:00 or 09:20-12:50
+    if (!val.includes('T') && !val.includes('1899')) return val;
+    // ISO time format: 1899-12-30T23:00:00.000Z -> convert to HH:MM
+    if (val.includes('1899') || val.includes('T')) {
+      const dt = new Date(val);
+      // Add 8 hours for UTC+8
+      const adjusted = new Date(dt.getTime() + 8*3600000);
+      const hh = adjusted.getUTCHours().toString().padStart(2,'0');
+      const mm = adjusted.getUTCMinutes().toString().padStart(2,'0');
+      return hh + ':' + mm;
+    }
+  }
+  return String(val);
 }
 
 function groupByDay() {
@@ -686,7 +713,7 @@ function renderTodayCard() {
   }
   container.innerHTML = rows.slice(0,4).map(r => `
     <div class="today-item">
-      <div class="today-time">${r['時間']||''}</div>
+      <div class="today-time">${fixTime(r['時間']||'')}</div>
       <div><div class="today-name">${r['行程']||''}</div>
       <div class="today-note">${(r['解說']||'').substring(0,30)}${(r['解說']||'').length>30?'...':''}</div></div>
     </div>`).join('');
@@ -727,7 +754,7 @@ function renderItinerary() {
 
 function renderTlItem(r, di, ri) {
   const name = r['行程'] || '';
-  const time = r['時間'] || '';
+  const time = fixTime(r['時間'] || '');
   const note = r['解說'] || '';
   const items = r['要帶的物品'] || '';
   const mapQ = encodeURIComponent(name.replace(/[【】A案B案・]/g,'').substring(0,20) + ' 大阪');
