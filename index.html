@@ -474,7 +474,62 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--w50);color:var(--tex
 <div class="toast" id="toast"></div>
 
 <script>
-const API = 'https://script.google.com/macros/s/AKfycbytb-BpdJ_6oTvfqeSA_kA3h0WPFwgrQ-Ifymis25pf8tjw-KjeHRunZdxoXGDQotxd/exec';
+const API = 'https://script.google.com/macros/s/AKfycbxYNGFaP11gsVeCCtMA9Ls14N3ox2mu5qnxQAcsGyoT3Bm4cHTiIV4CPxbGe3vn6auv/exec';
+
+// JSONP 方式讀取（解決 CORS）
+function fetchJsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = 'cb_' + Date.now();
+    const script = document.createElement('script');
+    script.src = url + '&callback=' + cb;
+    window[cb] = (data) => {
+      delete window[cb];
+      document.body.removeChild(script);
+      resolve(data);
+    };
+    script.onerror = () => {
+      delete window[cb];
+      document.body.removeChild(script);
+      reject(new Error('JSONP failed'));
+    };
+    document.body.appendChild(script);
+  });
+}
+
+async function syncNow() {
+  document.getElementById('syncStatus').textContent = '同步中...';
+  try {
+    const json = await fetchJsonp(API + '?action=read');
+    if (json.ok) {
+      allData = json.data;
+      renderAll();
+      const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+      document.getElementById('syncStatus').textContent = '最後同步：' + now;
+      showToast('✅ 行程已更新');
+    }
+  } catch(e) {
+    document.getElementById('syncStatus').textContent = '同步失敗，請重試';
+    showToast('❌ 無法連接，請確認網路');
+  }
+}
+
+async function pushData() {
+  document.getElementById('syncStatus').textContent = '儲存中...';
+  try {
+    // 寫入用 no-cors fetch（Apps Script 會收到）
+    await fetch(API, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'write', rows: allData })
+    });
+    const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+    document.getElementById('syncStatus').textContent = '已儲存：' + now;
+    showToast('✅ 已同步至 Google Sheets');
+  } catch(e) {
+    showToast('❌ 儲存失敗，請重試');
+  }
+}
 const DAYS = ['7月18日','7月19日','7月20日','7月21日','7月22日','7月23日','7月24日','7月25日'];
 const DAY_LABELS = ['7/18 六','7/19 日','7/20 一','7/21 二','7/22 三','7/23 四','7/24 五','7/25 六'];
 const DAY_HEADERS = [
