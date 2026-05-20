@@ -212,7 +212,36 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--w50);color:var(--tex
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* TOAST */
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+.cl-day-content{display:none}.cl-day-content.active{display:block}
+.cl-category{margin:0 16px 4px}
+.cl-cat-label{font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--hint);
+  text-transform:uppercase;padding:12px 0 4px}
+.cl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
+  overflow:hidden;margin-bottom:8px}
+.cl-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;
+  border-bottom:1px solid var(--w50);cursor:pointer;transition:background .15s}
+.cl-item:last-child{border-bottom:none}
+.cl-item:active{background:var(--w50)}
+.cl-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  margin-top:1px;transition:all .2s}
+.cl-check.done{background:var(--green);border-color:var(--green)}
+.cl-check.done::after{content:'';width:11px;height:7px;border-left:2px solid #fff;
+  border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.cl-info{flex:1}
+.cl-name{font-size:13px;color:var(--text);line-height:1.4}
+.cl-name.done-text{text-decoration:line-through;color:var(--hint)}
+.cl-note{font-size:11px;color:var(--hint);margin-top:2px;line-height:1.4}
+.cl-progress{margin:12px 16px;background:var(--card);border:1px solid var(--border);
+  border-radius:12px;padding:12px 14px}
+.cl-progress-bar{height:6px;background:var(--w100);border-radius:3px;margin:8px 0 4px;overflow:hidden}
+.cl-progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
+.cl-progress-label{font-size:11px;color:var(--sub);display:flex;justify-content:space-between}
+.cl-reset-btn{width:100%;margin-top:8px;padding:8px;border:1px solid var(--border);
+  border-radius:8px;background:var(--surf);color:var(--sub);font-size:12px;
+  cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
   background:var(--w800);color:#fff;border-radius:20px;padding:8px 18px;
   font-size:12px;z-index:600;opacity:0;transition:opacity .3s;white-space:nowrap}
 .toast.show{opacity:1}
@@ -335,6 +364,14 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--w50);color:var(--tex
   </div>
 </div>
 
+<!-- CHECKLIST -->
+<div class="page" id="page-checklist">
+  <div class="day-selector" id="clDaySelector"></div>
+  <div id="clContent">
+    <div class="loading" style="margin-top:40px"><div class="loading-spinner"></div>載入物品清單中</div>
+  </div>
+</div>
+
 <!-- JAPANESE -->
 <div class="page" id="page-jp">
   <div class="sos-card">
@@ -385,6 +422,9 @@ body{font-family:'Noto Sans TC',sans-serif;background:var(--w50);color:var(--tex
   </button>
   <button class="nav-btn" id="nav-map" onclick="showPage('map')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>地圖
+  </button>
+  <button class="nav-btn" id="nav-checklist" onclick="showPage('checklist')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>清單
   </button>
   <button class="nav-btn" id="nav-jp" onclick="showPage('jp')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>日文
@@ -894,6 +934,151 @@ function showDay(dayId, el) {
   if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
   currentDay = dayId;
 }
+
+// ── CHECKLIST ──
+const CL_DAYS = [
+  {id:'cl0', label:'7/18 六', key:'2026-07-18'},
+  {id:'cl1', label:'7/19A 奈良', key:'7/19A租車'},
+  {id:'cl2', label:'7/19B 水樂園', key:'7/19B水樂園'},
+  {id:'cl3', label:'7/20 棒球', key:'7/20棒球'},
+  {id:'cl4', label:'7/21 USJ', key:'7/21USJ'},
+  {id:'cl5', label:'7/23 海遊館', key:'7/23海遊館'},
+  {id:'cl6', label:'7/24 天神祭', key:'7/24天神祭'},
+];
+
+let clData = [];
+let clChecked = JSON.parse(localStorage.getItem('clChecked') || '{}');
+
+async function loadChecklist() {
+  try {
+    const json = await fetchJsonp(API + '?action=readItems');
+    if (json.ok) {
+      clData = json.data;
+      renderChecklist();
+    }
+  } catch(e) {
+    document.getElementById('clContent').innerHTML =
+      '<div style="text-align:center;padding:30px;color:var(--hint);font-size:12px">載入失敗，請同步後重試</div>';
+  }
+}
+
+function renderChecklist() {
+  // Selector
+  const sel = document.getElementById('clDaySelector');
+  sel.innerHTML = CL_DAYS.map((d,i) =>
+    `<div class="day-chip ${i===0?'active':''}" onclick="showClDay('${d.id}',this)">${d.label}</div>`
+  ).join('');
+
+  // Contents
+  const content = document.getElementById('clContent');
+  content.innerHTML = CL_DAYS.map((day, di) => {
+    // Filter items that have ✓ in this day's column
+    const dayItems = clData.filter(row => {
+      const val = row[day.key];
+      return val && String(val).includes('✓');
+    });
+
+    // Group by category
+    const cats = {};
+    dayItems.forEach(row => {
+      const cat = row['類別'] || '其他';
+      if (!cats[cat]) cats[cat] = [];
+      cats[cat].push(row);
+    });
+
+    const totalItems = dayItems.length;
+    const checkedCount = dayItems.filter(row => clChecked[day.key + '_' + row['物品']]).length;
+
+    return `
+    <div class="cl-day-content ${di===0?'active':''}" id="${day.id}">
+      <div class="cl-progress">
+        <div class="cl-progress-label">
+          <span>今日攜帶物品</span>
+          <span id="cnt-${day.id}">${checkedCount} / ${totalItems} 件</span>
+        </div>
+        <div class="cl-progress-bar">
+          <div class="cl-progress-fill" id="bar-${day.id}"
+            style="width:${totalItems?Math.round(checkedCount/totalItems*100):0}%"></div>
+        </div>
+        <button class="cl-reset-btn" onclick="resetDay('${day.key}','${day.id}')">重置今日清單</button>
+      </div>
+      ${Object.entries(cats).map(([cat, items]) => `
+        <div class="cl-category">
+          <div class="cl-cat-label">${cat}</div>
+          <div class="cl-card">
+            ${items.map(row => {
+              const key = day.key + '_' + row['物品'];
+              const checked = clChecked[key] ? 'done' : '';
+              const note = row['說明'] || '';
+              return `
+              <div class="cl-item" onclick="toggleCl('${key}','${day.id}',${totalItems},this)">
+                <div class="cl-check ${checked}"></div>
+                <div class="cl-info">
+                  <div class="cl-name ${checked?'done-text':''}">${row['物品']||''}</div>
+                  ${note ? `<div class="cl-note">${note}</div>` : ''}
+                </div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+
+function toggleCl(key, dayId, total, el) {
+  clChecked[key] = !clChecked[key];
+  localStorage.setItem('clChecked', JSON.stringify(clChecked));
+  const check = el.querySelector('.cl-check');
+  const name = el.querySelector('.cl-name');
+  check.classList.toggle('done', clChecked[key]);
+  name.classList.toggle('done-text', clChecked[key]);
+  updateClProgress(dayId, total);
+}
+
+function updateClProgress(dayId, total) {
+  const day = CL_DAYS.find(d => d.id === dayId);
+  if (!day) return;
+  const dayItems = clData.filter(row => {
+    const val = row[day.key];
+    return val && String(val).includes('✓');
+  });
+  const checked = dayItems.filter(row => clChecked[day.key + '_' + row['物品']]).length;
+  const pct = total ? Math.round(checked/total*100) : 0;
+  const bar = document.getElementById('bar-' + dayId);
+  const cnt = document.getElementById('cnt-' + dayId);
+  if (bar) bar.style.width = pct + '%';
+  if (cnt) cnt.textContent = checked + ' / ' + total + ' 件';
+}
+
+function resetDay(dayKey, dayId) {
+  if (!confirm('重置今日所有勾選？')) return;
+  Object.keys(clChecked).forEach(k => {
+    if (k.startsWith(dayKey + '_')) delete clChecked[k];
+  });
+  localStorage.setItem('clChecked', JSON.stringify(clChecked));
+  renderChecklist();
+  showClDay(dayId, document.querySelector('#clDaySelector .day-chip.active'));
+  showToast('✅ 已重置');
+}
+
+function showClDay(dayId, el) {
+  document.querySelectorAll('.cl-day-content').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('#clDaySelector .day-chip').forEach(c => c.classList.remove('active'));
+  const dc = document.getElementById(dayId);
+  if (dc) dc.classList.add('active');
+  if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
+}
+
+// Override showPage to load checklist on first visit
+const _origShowPage = showPage;
+let clLoaded = false;
+showPage = function(name) {
+  _origShowPage(name);
+  if (name === 'checklist' && !clLoaded) {
+    clLoaded = true;
+    loadChecklist();
+  }
+};
 
 // ── INIT ──
 updateCountdown();
