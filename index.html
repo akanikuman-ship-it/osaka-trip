@@ -1,1098 +1,888 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
+<!doctype html>
+<html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>2026 大阪旅遊</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root {
-  --w50:#faf6f0;--w100:#f2e8d8;--w200:#e0c9a6;--w300:#c9a478;
-  --w400:#b08050;--w500:#8b6340;--w600:#6e4e30;--w700:#523b22;
-  --w800:#382818;--text:#2d1f0e;--sub:#7a5c3a;--hint:#b09070;
-  --border:#e8d8c0;--card:#fff;--surf:#fdfaf6;
-  --green:#4a7c59;--gl:#d4e8da;--red:#c0392b;--rl:#fde8e6;
-  --blue:#2980b9;--bl:#dceefb;--amber:#d4830a;--al:#fef3dc;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Noto Sans TC',sans-serif;background:var(--w50);color:var(--text);
-  max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 大阪家族旅</title>
+  <style>
+    :root {
+      --bg: #f7f4eb;
+      --paper: #fffdf8;
+      --card: #ffffff;
+      --ink: #57463a;
+      --muted: #938578;
+      --line: #e2dfd2;
+      --green: #79b65c;
+      --teal: #27aaa0;
+      --blue: #3da7df;
+      --orange: #ef965d;
+      --yellow: #ffd85f;
+      --red: #df695c;
+      --shadow: 5px 5px 0 #e0e5d5;
+      --radius: 18px;
+    }
 
-/* HEADER */
-.app-header{background:var(--w700);color:#fff;padding:48px 20px 14px;
-  position:sticky;top:0;z-index:100}
-.app-header h1{font-family:'Noto Serif JP',serif;font-size:19px;font-weight:600;letter-spacing:.05em}
-.app-header .sub{font-size:11px;opacity:.65;margin-top:2px}
-.header-row{display:flex;align-items:center;justify-content:space-between}
-.sync-btn{background:rgba(255,255,255,.15);border:none;color:#fff;border-radius:8px;
-  padding:5px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  display:flex;align-items:center;gap:4px}
-.sync-btn svg{width:13px;height:13px}
-.sync-status{font-size:10px;opacity:.6;margin-top:3px;text-align:right}
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8px 8px, rgba(119, 145, 92, .16) 0 2px, transparent 2.4px) 0 0 / 24px 24px,
+        var(--bg);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
 
-/* BOTTOM NAV */
-.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;background:var(--card);border-top:1px solid var(--border);
-  display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,0)}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
-  padding:10px 0;cursor:pointer;border:none;background:none;color:var(--hint);
-  font-size:10px;font-family:'Noto Sans TC',sans-serif;transition:color .2s}
-.nav-btn.active{color:var(--w600)}
-.nav-btn svg{width:22px;height:22px;stroke-width:1.8}
+    button, input, select { font: inherit; }
+    a { color: inherit; }
+    h1, h2, h3, p, div, span { overflow-wrap: anywhere; }
 
-/* PAGES */
-.page{display:none;padding-bottom:80px}
-.page.active{display:block;animation:fadeIn .22s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    .app {
+      width: 100%;
+      max-width: min(980px, 100vw);
+      margin: 0 auto;
+      min-height: 100vh;
+      padding: 22px 16px 96px;
+      overflow-x: hidden;
+    }
 
-.sec-title{font-size:11px;font-weight:500;letter-spacing:.14em;color:var(--hint);
-  text-transform:uppercase;padding:18px 20px 7px}
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin: -22px -16px 18px;
+      padding: 18px 16px 14px;
+      background: rgba(247, 244, 235, .92);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px dashed rgba(119, 145, 92, .16);
+      overflow: hidden;
+    }
 
-/* HOME */
-.hero-card{margin:14px 16px;background:var(--w700);border-radius:16px;padding:20px;
-  color:#fff;position:relative;overflow:hidden}
-.hero-card::before{content:'🇯🇵';position:absolute;right:-8px;top:-8px;font-size:76px;opacity:.1}
-.hero-card .trip-name{font-family:'Noto Serif JP',serif;font-size:21px;font-weight:600;margin-bottom:3px}
-.hero-card .trip-dates{font-size:12px;opacity:.7;margin-bottom:16px}
-.hero-stats{display:flex;gap:10px}
-.hero-stat{background:rgba(255,255,255,.12);border-radius:10px;padding:10px 12px;flex:1;text-align:center}
-.hero-stat .num{font-size:22px;font-weight:600;font-family:'Noto Serif JP',serif;display:block}
-.hero-stat .lbl{font-size:10px;opacity:.7;margin-top:1px;display:block}
+    .header-inner {
+      width: 100%;
+      max-width: min(980px, 100vw);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+    }
 
-.weather-row{margin:0 16px;background:var(--card);border-radius:12px;border:1px solid var(--border);
-  padding:13px 15px;display:flex;align-items:center;gap:12px}
-.weather-icon{font-size:30px}
-.weather-info .temp{font-size:20px;font-weight:500;color:var(--w600)}
-.weather-info .desc{font-size:11px;color:var(--sub);margin-top:2px}
+    h1 {
+      margin: 0;
+      color: var(--teal);
+      font-size: clamp(28px, 7vw, 42px);
+      line-height: 1.08;
+      font-weight: 900;
+    }
 
-.today-card{margin:0 16px 10px;background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden}
-.today-card-header{background:var(--w100);padding:9px 15px;display:flex;align-items:center;gap:8px}
-.day-badge{background:var(--w600);color:#fff;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:500}
-.day-label{font-size:12px;color:var(--sub)}
-.today-item{padding:11px 15px;border-bottom:1px solid var(--w50);display:flex;align-items:flex-start;gap:11px}
-.today-item:last-child{border-bottom:none}
-.today-time{font-size:11px;color:var(--hint);min-width:50px;padding-top:2px;font-variant-numeric:tabular-nums}
-.today-name{font-size:13px;font-weight:500}
-.today-note{font-size:11px;color:var(--sub);margin-top:2px}
+    .subtitle {
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 15px;
+      line-height: 1.35;
+      max-width: calc(100vw - 32px);
+      word-break: break-all;
+    }
 
-.checklist-card{margin:0 16px 10px;background:var(--card);border-radius:12px;border:1px solid var(--border);overflow:hidden}
-.check-item{display:flex;align-items:center;gap:10px;padding:10px 15px;border-bottom:1px solid var(--w50);cursor:pointer}
-.check-item:last-child{border-bottom:none}
-.check-circle{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;transition:all .2s}
-.check-circle.done{background:var(--green);border-color:var(--green)}
-.check-circle.done::after{content:'';width:10px;height:6px;border-left:2px solid #fff;
-  border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
-.check-task{font-size:13px;flex:1}
-.check-task.done-text{text-decoration:line-through;color:var(--hint)}
-.urgency{font-size:10px;padding:2px 7px;border-radius:20px;white-space:nowrap}
-.urg{background:var(--rl);color:var(--red)}
-.soon{background:var(--al);color:var(--amber)}
-.ok{background:var(--gl);color:var(--green)}
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #e7f4df;
+      color: #4f843e;
+      font-weight: 900;
+      white-space: nowrap;
+    }
 
-/* ITINERARY */
-.day-selector{display:flex;gap:5px;padding:10px 15px;overflow-x:auto;scrollbar-width:none;
-  background:var(--card);border-bottom:1px solid var(--border);position:sticky;top:62px;z-index:50}
-.day-selector::-webkit-scrollbar{display:none}
-.day-chip{flex-shrink:0;padding:5px 12px;border-radius:20px;font-size:12px;
-  border:1px solid var(--border);background:var(--surf);color:var(--sub);
-  cursor:pointer;transition:all .2s;white-space:nowrap}
-.day-chip.active{background:var(--w600);border-color:var(--w600);color:#fff}
+    .tabs {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 20;
+      background: rgba(255, 253, 248, .96);
+      border-top: 1px solid var(--line);
+      box-shadow: 0 -10px 30px rgba(85, 71, 58, .10);
+      padding: 7px 4px max(7px, env(safe-area-inset-bottom));
+      overflow: hidden;
+    }
 
-.day-content{display:none}
-.day-content.active{display:block}
-.day-header{padding:14px 20px 8px;border-bottom:1px solid var(--border);background:var(--w50);
-  display:flex;align-items:center;justify-content:space-between}
-.day-header-left .date-big{font-family:'Noto Serif JP',serif;font-size:16px;font-weight:600;color:var(--w700)}
-.member-badge{display:inline-block;margin-top:3px;background:var(--w100);color:var(--w600);
-  border-radius:20px;font-size:10px;padding:2px 9px}
-.add-btn{background:var(--w600);color:#fff;border:none;border-radius:8px;
-  padding:6px 12px;font-size:12px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  display:flex;align-items:center;gap:4px;flex-shrink:0}
-.add-btn svg{width:14px;height:14px}
+    .tabs-inner {
+      width: calc(100vw - 8px);
+      max-width: 720px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 3px;
+    }
 
-/* TIMELINE */
-.timeline{padding:14px 18px;position:relative}
-.timeline::before{content:'';position:absolute;left:34px;top:18px;bottom:18px;
-  width:1.5px;background:var(--border)}
-.tl-item{display:flex;gap:11px;margin-bottom:16px;position:relative}
-.tl-item.dragging{opacity:.4}
-.tl-item.drag-over{border-top:2px solid var(--w400)}
-.tl-dot{width:26px;height:26px;border-radius:50%;background:var(--w100);
-  border:2px solid var(--w300);display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;font-size:11px;position:relative;z-index:1;cursor:grab}
-.tl-dot.hl{background:var(--w600);border-color:var(--w600)}
-.tl-body{flex:1;background:var(--card);border:1px solid var(--border);border-radius:12px;
-  padding:11px 13px;position:relative}
-.tl-time{font-size:11px;color:var(--hint);font-variant-numeric:tabular-nums;margin-bottom:2px}
-.tl-name{font-size:14px;font-weight:500;margin-bottom:4px}
-.tl-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px}
-.tag{display:inline-flex;align-items:center;font-size:10px;padding:2px 7px;
-  border-radius:20px;border:1px solid var(--border);color:var(--sub);background:var(--surf)}
-.tag.tr{background:var(--bl);color:var(--blue);border-color:#b8d8f0}
-.tag.tk{background:var(--al);color:var(--amber);border-color:#f5dfa0}
-.tl-note{font-size:11px;color:var(--sub);line-height:1.6;border-top:1px solid var(--w50);
-  padding-top:5px;margin-top:5px}
-.tl-items-tag{margin-top:5px;font-size:10px;color:var(--hint);background:var(--w50);
-  border-radius:6px;padding:4px 8px;line-height:1.6}
-.tl-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
-.map-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--w600);
-  background:var(--w100);border:none;border-radius:7px;padding:4px 9px;cursor:pointer;
-  text-decoration:none;font-family:'Noto Sans TC',sans-serif}
-.map-btn svg{width:12px;height:12px}
-.edit-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--sub);
-  background:var(--w50);border:1px solid var(--border);border-radius:7px;padding:4px 9px;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif}
-.del-btn{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--red);
-  background:var(--rl);border:none;border-radius:7px;padding:4px 9px;cursor:pointer;
-  font-family:'Noto Sans TC',sans-serif}
-.drag-handle{position:absolute;left:-6px;top:50%;transform:translateY(-50%);
-  cursor:grab;color:var(--hint);font-size:14px;padding:4px}
+    .tab {
+      border: 0;
+      background: transparent;
+      color: #9c9387;
+      border-radius: 14px;
+      padding: 8px 1px;
+      font-size: 11px;
+      font-weight: 900;
+      cursor: pointer;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: clip;
+    }
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;
-  display:flex;align-items:flex-end;justify-content:center}
-.modal-overlay.hidden{display:none}
-.modal{background:var(--card);border-radius:20px 20px 0 0;padding:20px;width:100%;
-  max-width:430px;max-height:90vh;overflow-y:auto;animation:slideUp .25s ease}
-@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.modal-title{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:600;
-  margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
-.modal-close{background:var(--w100);border:none;border-radius:50%;width:28px;height:28px;
-  cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
-.field-group{margin-bottom:13px}
-.field-label{font-size:11px;color:var(--sub);margin-bottom:4px;font-weight:500}
-.field-input{width:100%;border:1px solid var(--border);border-radius:8px;
-  padding:9px 11px;font-size:13px;font-family:'Noto Sans TC',sans-serif;
-  background:var(--surf);color:var(--text);outline:none}
-.field-input:focus{border-color:var(--w400)}
-.field-select{width:100%;border:1px solid var(--border);border-radius:8px;
-  padding:9px 11px;font-size:13px;font-family:'Noto Sans TC',sans-serif;
-  background:var(--surf);color:var(--text);outline:none}
-.field-textarea{width:100%;border:1px solid var(--border);border-radius:8px;
-  padding:9px 11px;font-size:13px;font-family:'Noto Sans TC',sans-serif;
-  background:var(--surf);color:var(--text);outline:none;resize:vertical;min-height:70px}
-.modal-actions{display:flex;gap:8px;margin-top:16px}
-.btn-primary{flex:1;background:var(--w600);color:#fff;border:none;border-radius:10px;
-  padding:12px;font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-weight:500}
-.btn-secondary{background:var(--w50);color:var(--sub);border:1px solid var(--border);
-  border-radius:10px;padding:12px 16px;font-size:14px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+    .link-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      border-radius: 16px;
+      background: var(--paper);
+      border: 1px solid #e8e3d5;
+      padding: 15px;
+      box-shadow: 3px 3px 0 #e8e6d9;
+    }
+    .link-card strong {
+      display: block;
+      color: var(--teal);
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+    .phrase {
+      display: grid;
+      gap: 8px;
+      padding: 14px;
+      border-radius: 15px;
+      background: var(--paper);
+      border: 1px solid #e8e3d5;
+    }
+    .jp {
+      color: var(--teal);
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.35;
+    }
+    .zh {
+      color: var(--muted);
+      font-weight: 850;
+      line-height: 1.45;
+    }
+    .tab.active {
+      color: #4f843e;
+      background: #e7f4df;
+    }
+    .tab:active { transform: scale(.96); }
 
-/* MAP PAGE */
-.spots-list{padding:0 16px}
-.spot-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border)}
-.spot-dot{width:9px;height:9px;border-radius:50%;background:var(--w400);flex-shrink:0}
-.spot-info{flex:1}
-.spot-info .sname{font-size:13px}
-.spot-info .sdate{font-size:10px;color:var(--hint);margin-top:1px}
+    .section { display: none; }
+    .section.active { display: block; }
 
-/* JAPANESE PAGE */
-.sos-card{margin:14px 16px 0;background:var(--rl);border:1px solid #f0c0bc;border-radius:12px;padding:13px 15px}
-.sos-title{font-size:12px;font-weight:500;color:var(--red);margin-bottom:9px;display:flex;align-items:center;gap:5px}
-.sos-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(192,57,43,.1)}
-.sos-row:last-child{border-bottom:none}
-.sos-label{font-size:11px;color:var(--sub)}
-.sos-num{font-size:15px;font-weight:500;color:var(--red)}
-.jp-cat-title{font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--hint);
-  padding:13px 20px 5px;text-transform:uppercase}
-.jp-card{margin:0 16px 8px;background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.jp-phrase{padding:11px 15px;border-bottom:1px solid var(--w50);cursor:pointer;position:relative}
-.jp-phrase:last-child{border-bottom:none}
-.jp-jp{font-size:16px;color:var(--w800);font-family:'Noto Serif JP',serif;margin-bottom:2px}
-.jp-roma{font-size:10px;color:var(--hint);margin-bottom:3px}
-.jp-zh{font-size:12px;color:var(--sub)}
-.play-btn{float:right;width:26px;height:26px;border-radius:50%;background:var(--w100);
-  border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;margin-top:3px}
-.play-btn svg{width:11px;height:11px;fill:var(--w600)}
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      margin-bottom: 18px;
+      min-width: 0;
+    }
 
-/* LOADING */
-.loading{text-align:center;padding:40px 20px;color:var(--hint)}
-.loading-spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--w500);
-  border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 10px}
-@keyframes spin{to{transform:rotate(360deg)}}
+    .weather, .countdown {
+      border-radius: var(--radius);
+      color: white;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-width: 0;
+      max-width: 100%;
+    }
+    .weather {
+      padding: 22px;
+      background: linear-gradient(135deg, #35b9e9, #2d9ed2);
+      min-height: 186px;
+    }
+    .countdown {
+      padding: 18px;
+      background: linear-gradient(135deg, #37a999, #81bd70);
+      display: grid;
+      align-content: center;
+    }
+    .weather .city, .countdown .label {
+      opacity: .9;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+    .weather .big {
+      margin-top: 10px;
+      font-size: clamp(34px, 7vw, 54px);
+      font-weight: 900;
+      line-height: 1;
+    }
+    .weather .meta {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .weather .mini {
+      padding: 12px 8px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.20);
+      text-align: center;
+      font-weight: 900;
+      min-width: 0;
+    }
+    .countdown .days {
+      margin-top: 8px;
+      font-size: clamp(38px, 8vw, 68px);
+      font-weight: 950;
+      line-height: 1;
+    }
 
-/* TOAST */
-.cl-day-content{display:none}.cl-day-content.active{display:block}
-.cl-category{margin:0 16px 4px}
-.cl-cat-label{font-size:10px;font-weight:500;letter-spacing:.12em;color:var(--hint);
-  text-transform:uppercase;padding:12px 0 4px}
-.cl-card{background:var(--card);border:1px solid var(--border);border-radius:12px;
-  overflow:hidden;margin-bottom:8px}
-.cl-item{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;
-  border-bottom:1px solid var(--w50);cursor:pointer;transition:background .15s}
-.cl-item:last-child{border-bottom:none}
-.cl-item:active{background:var(--w50)}
-.cl-check{width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border);
-  flex-shrink:0;display:flex;align-items:center;justify-content:center;
-  margin-top:1px;transition:all .2s}
-.cl-check.done{background:var(--green);border-color:var(--green)}
-.cl-check.done::after{content:'';width:11px;height:7px;border-left:2px solid #fff;
-  border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
-.cl-info{flex:1}
-.cl-name{font-size:13px;color:var(--text);line-height:1.4}
-.cl-name.done-text{text-decoration:line-through;color:var(--hint)}
-.cl-note{font-size:11px;color:var(--hint);margin-top:2px;line-height:1.4}
-.cl-progress{margin:12px 16px;background:var(--card);border:1px solid var(--border);
-  border-radius:12px;padding:12px 14px}
-.cl-progress-bar{height:6px;background:var(--w100);border-radius:3px;margin:8px 0 4px;overflow:hidden}
-.cl-progress-fill{height:100%;background:var(--green);border-radius:3px;transition:width .3s}
-.cl-progress-label{font-size:11px;color:var(--sub);display:flex;justify-content:space-between}
-.cl-reset-btn{width:100%;margin-top:8px;padding:8px;border:1px solid var(--border);
-  border-radius:8px;background:var(--surf);color:var(--sub);font-size:12px;
-  cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+    .date-strip {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      max-width: 100%;
+      padding: 4px 2px 14px;
+      scrollbar-width: none;
+    }
+    .date-strip::-webkit-scrollbar { display: none; }
+    .date-btn {
+      flex: 0 0 auto;
+      width: 86px;
+      border: 3px solid #e4e8dc;
+      background: var(--card);
+      color: #8b8075;
+      border-radius: 18px;
+      padding: 10px 8px;
+      box-shadow: 3px 3px 0 #e8e6d9;
+      cursor: pointer;
+      font-weight: 900;
+    }
+    .date-btn.active {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: white;
+    }
+    .date-btn .day { display: block; font-size: 11px; opacity: .86; }
+    .date-btn .date { display: block; margin-top: 2px; font-size: 25px; line-height: 1; }
 
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
-  background:var(--w800);color:#fff;border-radius:20px;padding:8px 18px;
-  font-size:12px;z-index:600;opacity:0;transition:opacity .3s;white-space:nowrap}
-.toast.show{opacity:1}
-</style>
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(226, 223, 210, .95);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      margin-bottom: 16px;
+      min-width: 0;
+      max-width: 100%;
+    }
+
+    .day-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 10px;
+    }
+    .day-title h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.1;
+    }
+    .day-theme {
+      color: white;
+      background: var(--orange);
+      border-radius: 999px;
+      padding: 7px 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 12px;
+    }
+    .event {
+      display: grid;
+      grid-template-columns: 74px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 15px;
+      background: var(--paper);
+      border: 1px solid #e8e3d5;
+    }
+    .time {
+      color: var(--orange);
+      font-size: 18px;
+      font-weight: 950;
+      line-height: 1.1;
+    }
+    .event h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.28;
+    }
+    .event p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-weight: 750;
+      line-height: 1.45;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .chip {
+      display: inline-flex;
+      border-radius: 999px;
+      padding: 4px 8px;
+      background: #edf6e8;
+      color: #4f843e;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .chip.fixed { background: #ffe5df; color: #bd4b40; }
+    .chip.fast { background: #e4f0ff; color: #276bb5; }
+    .chip.flex { background: #f0e8ff; color: #7351bb; }
+    .map-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 34px;
+      margin-top: 10px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #e8f3f0;
+      color: #2f7d69;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 950;
+    }
+    .map-link:active { transform: scale(.96); }
+
+    .booking-grid, .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .pass {
+      min-height: 170px;
+      background: linear-gradient(180deg, #eaf3ff 0 42%, #ffffff 42%);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid #dfe7ee;
+    }
+    .pass .airline {
+      color: var(--muted);
+      font-weight: 900;
+      text-align: center;
+    }
+    .pass .flight {
+      margin: 8px auto 12px;
+      width: fit-content;
+      padding: 9px 22px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.82);
+      color: #7a5f48;
+      font-size: 36px;
+      font-weight: 950;
+      letter-spacing: 2px;
+    }
+    .route-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+      text-align: center;
+      font-weight: 950;
+    }
+    .airport { font-size: 30px; color: #6d5847; }
+    .plane { color: var(--blue); font-size: 24px; }
+    .subline {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      color: var(--muted);
+      font-weight: 850;
+    }
+
+    .map-img {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      background: #eef3ea;
+    }
+
+    .notice {
+      border-left: 6px solid var(--yellow);
+      background: #fff8dc;
+      border-radius: 14px;
+      padding: 14px;
+      font-weight: 850;
+      color: #6d5847;
+      margin-bottom: 14px;
+    }
+
+    .todo {
+      display: grid;
+      gap: 10px;
+    }
+    .todo label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--paper);
+      border: 1px solid #e8e3d5;
+      font-weight: 850;
+    }
+    .todo input {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--green);
+    }
+
+    .footer-note {
+      margin: 22px 4px;
+      color: var(--muted);
+      text-align: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .hero-grid, .booking-grid, .info-grid { grid-template-columns: 1fr; }
+      .weather .meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .header-inner { grid-template-columns: 1fr; }
+      .badge { width: fit-content; }
+      .event { grid-template-columns: 62px 1fr; padding: 12px; }
+      .time { font-size: 16px; }
+      .pass .flight { font-size: 30px; }
+      .airport { font-size: 26px; }
+      .tab { font-size: 10px; padding-left: 0; padding-right: 0; }
+    }
+
+    @media print {
+      body { background: white; }
+      .header { position: static; margin: 0 0 12px; }
+      .tabs { display: none; }
+      .app { max-width: none; padding: 12mm; }
+      .section { display: block; page-break-after: always; }
+      .card, .pass, .weather, .countdown, .map-img { box-shadow: none; }
+    }
+  </style>
 </head>
 <body>
-
-<header class="app-header">
-  <div class="header-row">
-    <div>
-      <h1>🗾 大阪旅遊 2026</h1>
-      <div class="sub">7/18 – 7/25 ・ 8天7夜</div>
-    </div>
-    <button class="sync-btn" onclick="syncNow()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
-        <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
-      </svg>
-      同步
-    </button>
-  </div>
-  <div class="sync-status" id="syncStatus">點擊同步載入最新行程</div>
-</header>
-
-<!-- HOME -->
-<div class="page active" id="page-home">
-  <div class="hero-card">
-    <div class="trip-name">大阪親子旅行</div>
-    <div class="trip-dates">2026.07.18 – 07.25・8天7夜</div>
-    <div class="hero-stats">
-      <div class="hero-stat">
-        <span class="num" id="countdown">—</span>
-        <span class="lbl">出發倒數</span>
+  <div class="header">
+    <div class="header-inner">
+      <div>
+        <h1>2026 大阪家族旅</h1>
+        <div class="subtitle">7/18 - 7/25｜Regale Namba｜USJ・白崎海洋公園・宇治・天神祭</div>
       </div>
-      <div class="hero-stat">
-        <span class="num">8</span>
-        <span class="lbl">旅遊天數</span>
-      </div>
+      <div class="badge">目前版：USJ 7/21 已更新</div>
     </div>
   </div>
 
-  <div class="sec-title">大阪天氣</div>
-  <div class="weather-row">
-    <div class="weather-icon">☀️</div>
-    <div class="weather-info">
-      <div class="temp">33°C / 27°C</div>
-      <div class="desc">7月大阪・晴時多雲・午後雷陣雨・濕度78%</div>
-    </div>
-  </div>
-
-  <div class="sec-title">今日重點行程</div>
-  <div class="today-card" id="todayCard">
-    <div class="today-card-header">
-      <span class="day-badge" id="todayBadge">—</span>
-      <span class="day-label" id="todayLabel">載入中...</span>
-    </div>
-    <div id="todayItems">
-      <div class="loading"><div class="loading-spinner"></div>讀取行程中</div>
-    </div>
-  </div>
-
-  <div class="sec-title">訂票待辦清單</div>
-  <div class="checklist-card">
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">7/20 棒球票 B指定席 (KKDAY)</span>
-      <span class="urgency urg">立即</span>
-    </div>
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">7/19 Alphard 8人座租車</span>
-      <span class="urgency urg">立即</span>
-    </div>
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">7/21 USJ VIP 兒童版</span>
-      <span class="urgency soon">5/22開搶</span>
-    </div>
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">蟹道樂道頓堀 7/18晚餐預約</span>
-      <span class="urgency soon">出發前</span>
-    </div>
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">7/23 海遊館+聖瑪利亞號套票</span>
-      <span class="urgency ok">7/16前</span>
-    </div>
-    <div class="check-item" onclick="toggleCheck(this)">
-      <div class="check-circle"></div><span class="check-task">7/19 枚方公園電子票</span>
-      <span class="urgency ok">當天早上</span>
-    </div>
-  </div>
-</div>
-
-<!-- ITINERARY -->
-<div class="page" id="page-trip">
-  <div class="day-selector" id="daySelector"></div>
-  <div id="dayContents">
-    <div class="loading" style="margin-top:40px"><div class="loading-spinner"></div>載入行程中</div>
-  </div>
-</div>
-
-<!-- MAP -->
-<div class="page" id="page-map">
-  <div style="margin:14px 16px;background:var(--card);border-radius:14px;border:1px solid var(--border);padding:18px;text-align:center">
-    <div style="font-size:36px;margin-bottom:7px">🗺</div>
-    <div style="font-size:14px;font-weight:500;color:var(--w700);margin-bottom:3px">大阪景點地圖</div>
-    <div style="font-size:11px;color:var(--hint);margin-bottom:14px">點擊景點可開啟 Google Maps 導航</div>
-    <a href="https://maps.google.com/?q=大阪" target="_blank"
-      style="display:inline-block;background:var(--w600);color:#fff;border-radius:20px;padding:7px 18px;font-size:12px;text-decoration:none">開啟完整地圖</a>
-  </div>
-  <div class="sec-title">行程景點一覽</div>
-  <div class="spots-list">
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">關西機場 KIX</div><div class="sdate">7/18 抵達 12:50</div></div><a class="map-btn" href="https://maps.google.com/?q=Kansai+International+Airport" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">道頓堀・心齋橋</div><div class="sdate">7/18・7/20</div></div><a class="map-btn" href="https://maps.google.com/?q=道頓堀+大阪" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">伏見稻荷・宇治・奈良東大寺</div><div class="sdate">7/19 A案</div></div><a class="map-btn" href="https://maps.google.com/?q=東大寺+奈良" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">枚方公園 The BOON</div><div class="sdate">7/19 B案</div></div><a class="map-btn" href="https://maps.google.com/?q=ひらかたパーク" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">京瓷巨蛋・歐力士棒球</div><div class="sdate">7/19・7/20</div></div><a class="map-btn" href="https://maps.google.com/?q=京セラドーム大阪" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">中之島・兒童圖書森林</div><div class="sdate">7/20</div></div><a class="map-btn" href="https://maps.google.com/?q=こども本の森中之島" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">環球影城 USJ</div><div class="sdate">7/21</div></div><a class="map-btn" href="https://maps.google.com/?q=Universal+Studios+Japan" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">海遊館・天保山</div><div class="sdate">7/23</div></div><a class="map-btn" href="https://maps.google.com/?q=海遊館+大阪" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">HEP FIVE・梅田</div><div class="sdate">7/24</div></div><a class="map-btn" href="https://maps.google.com/?q=HEP+FIVE+大阪" target="_blank">導航</a></div>
-    <div class="spot-row"><div class="spot-dot"></div><div class="spot-info"><div class="sname">大阪天神祭・大阪天滿宮</div><div class="sdate">7/24 煙火</div></div><a class="map-btn" href="https://maps.google.com/?q=大阪天満宮" target="_blank">導航</a></div>
-  </div>
-</div>
-
-<!-- CHECKLIST -->
-<div class="page" id="page-checklist">
-  <div class="day-selector" id="clDaySelector"></div>
-  <div id="clContent">
-    <div class="loading" style="margin-top:40px"><div class="loading-spinner"></div>載入物品清單中</div>
-  </div>
-</div>
-
-<!-- JAPANESE -->
-<div class="page" id="page-jp">
-  <div class="sos-card">
-    <div class="sos-title">⚠️ 日本緊急電話</div>
-    <div class="sos-row"><span class="sos-label">🚒 火災・救護</span><span class="sos-num">119</span></div>
-    <div class="sos-row"><span class="sos-label">🚓 警察・犯罪</span><span class="sos-num">110</span></div>
-    <div class="sos-row"><span class="sos-label">🏥 外國人諮詢</span><span class="sos-num">06-6941-2297</span></div>
-    <div class="sos-row"><span class="sos-label">🇹🇼 台灣辦事處</span><span class="sos-num">06-6443-8481</span></div>
-  </div>
-  <div class="jp-cat-title">基本問候・購物</div>
-  <div class="jp-card">
-    <div class="jp-phrase" onclick="speak('すみません')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">すみません</div><div class="jp-roma">Sumimasen</div><div class="jp-zh">不好意思 / 麻煩您</div></div>
-    <div class="jp-phrase" onclick="speak('これはいくらですか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">これはいくらですか？</div><div class="jp-roma">Kore wa ikura desu ka?</div><div class="jp-zh">這個多少錢？</div></div>
-    <div class="jp-phrase" onclick="speak('カードで払えますか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">カードで払えますか？</div><div class="jp-roma">Kaado de haraemasu ka?</div><div class="jp-zh">可以刷卡嗎？</div></div>
-    <div class="jp-phrase" onclick="speak('免税できますか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">免税できますか？</div><div class="jp-roma">Menzei dekimasu ka?</div><div class="jp-zh">可以退稅嗎？</div></div>
-    <div class="jp-phrase" onclick="speak('袋は要りません')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">袋は要りません</div><div class="jp-roma">Fukuro wa irimasen</div><div class="jp-zh">不需要袋子</div></div>
-  </div>
-  <div class="jp-cat-title">交通・問路</div>
-  <div class="jp-card">
-    <div class="jp-phrase" onclick="speak('難波駅はどこですか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">難波駅はどこですか？</div><div class="jp-roma">Namba-eki wa doko desu ka?</div><div class="jp-zh">難波車站在哪裡？</div></div>
-    <div class="jp-phrase" onclick="speak('写真を撮っていただけますか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">写真を撮っていただけますか？</div><div class="jp-roma">Shashin wo totte itadakemasu ka?</div><div class="jp-zh">可以請您幫我們拍照嗎？</div></div>
-    <div class="jp-phrase" onclick="speak('この電車は難波に止まりますか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">この電車は難波に止まりますか？</div><div class="jp-roma">Kono densha wa Namba ni tomarimasu ka?</div><div class="jp-zh">這班電車有停難波嗎？</div></div>
-  </div>
-  <div class="jp-cat-title">餐廳・點餐</div>
-  <div class="jp-card">
-    <div class="jp-phrase" onclick="speak('7人で予約したいのですが')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">7人で予約したいのですが</div><div class="jp-roma">Shichi-nin de yoyaku shitai no desu ga</div><div class="jp-zh">我想預約7人的位子</div></div>
-    <div class="jp-phrase" onclick="speak('おすすめは何ですか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">おすすめは何ですか？</div><div class="jp-roma">Osusume wa nan desu ka?</div><div class="jp-zh">有什麼推薦的嗎？</div></div>
-    <div class="jp-phrase" onclick="speak('お会計をお願いします')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">お会計をお願いします</div><div class="jp-roma">O-kaikei wo onegai shimasu</div><div class="jp-zh">麻煩幫我結帳</div></div>
-  </div>
-  <div class="jp-cat-title">緊急求救</div>
-  <div class="jp-card">
-    <div class="jp-phrase" onclick="speak('助けてください')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">助けてください！</div><div class="jp-roma">Tasukete kudasai!</div><div class="jp-zh">救命啊！請幫幫我！</div></div>
-    <div class="jp-phrase" onclick="speak('子供が迷子になりました')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">子供が迷子になりました</div><div class="jp-roma">Kodomo ga maigo ni narimashita</div><div class="jp-zh">我的小孩走失了</div></div>
-    <div class="jp-phrase" onclick="speak('救急車を呼んでください')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">救急車を呼んでください</div><div class="jp-roma">Kyukyusha wo yonde kudasai</div><div class="jp-zh">請叫救護車</div></div>
-    <div class="jp-phrase" onclick="speak('気分が悪いです')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">気分が悪いです</div><div class="jp-roma">Kibun ga warui desu</div><div class="jp-zh">我感覺不舒服</div></div>
-    <div class="jp-phrase" onclick="speak('近くの病院はどこですか')"><div class="play-btn"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div><div class="jp-jp">近くの病院はどこですか？</div><div class="jp-roma">Chikaku no byoin wa doko desu ka?</div><div class="jp-zh">附近的醫院在哪裡？</div></div>
-  </div>
-  <div style="height:16px"></div>
-</div>
-
-<!-- BOTTOM NAV -->
-<nav class="bottom-nav">
-  <button class="nav-btn active" id="nav-home" onclick="showPage('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>首頁
-  </button>
-  <button class="nav-btn" id="nav-trip" onclick="showPage('trip')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>行程
-  </button>
-  <button class="nav-btn" id="nav-map" onclick="showPage('map')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>地圖
-  </button>
-  <button class="nav-btn" id="nav-checklist" onclick="showPage('checklist')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>清單
-  </button>
-  <button class="nav-btn" id="nav-jp" onclick="showPage('jp')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>日文
-  </button>
-</nav>
-
-<!-- MODAL -->
-<div class="modal-overlay hidden" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-title">
-      <span id="modalTitle">編輯行程</span>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="field-group">
-      <div class="field-label">移到哪一天</div>
-      <select class="field-select" id="editDay"></select>
-    </div>
-    <div class="field-group">
-      <div class="field-label">時間</div>
-      <input class="field-input" id="editTime" placeholder="例：09:00-11:00">
-    </div>
-    <div class="field-group">
-      <div class="field-label">行程名稱</div>
-      <input class="field-input" id="editName" placeholder="景點或活動名稱">
-    </div>
-    <div class="field-group">
-      <div class="field-label">成員</div>
-      <input class="field-input" id="editMember" placeholder="例：5大2小">
-    </div>
-    <div class="field-group">
-      <div class="field-label">要帶的物品</div>
-      <input class="field-input" id="editItems" placeholder="例：護照/網卡/日幣">
-    </div>
-    <div class="field-group">
-      <div class="field-label">備註說明</div>
-      <textarea class="field-textarea" id="editNote" placeholder="注意事項、小提醒..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeModal()">取消</button>
-      <button class="btn-primary" onclick="saveItem()">儲存並同步</button>
-    </div>
-  </div>
-</div>
-
-<!-- ADD MODAL -->
-<div class="modal-overlay hidden" id="addModalOverlay">
-  <div class="modal">
-    <div class="modal-title">
-      <span>新增行程</span>
-      <button class="modal-close" onclick="closeAddModal()">✕</button>
-    </div>
-    <div class="field-group">
-      <div class="field-label">日期</div>
-      <select class="field-select" id="addDay"></select>
-    </div>
-    <div class="field-group">
-      <div class="field-label">星期</div>
-      <input class="field-input" id="addWeekday" placeholder="例：一">
-    </div>
-    <div class="field-group">
-      <div class="field-label">時間</div>
-      <input class="field-input" id="addTime" placeholder="例：09:00-11:00">
-    </div>
-    <div class="field-group">
-      <div class="field-label">行程名稱</div>
-      <input class="field-input" id="addName" placeholder="景點或活動名稱">
-    </div>
-    <div class="field-group">
-      <div class="field-label">成員</div>
-      <input class="field-input" id="addMember" placeholder="例：5大2小">
-    </div>
-    <div class="field-group">
-      <div class="field-label">要帶的物品</div>
-      <input class="field-input" id="addItems" placeholder="例：護照/網卡">
-    </div>
-    <div class="field-group">
-      <div class="field-label">備註說明</div>
-      <textarea class="field-textarea" id="addNote" placeholder="注意事項..."></textarea>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-secondary" onclick="closeAddModal()">取消</button>
-      <button class="btn-primary" onclick="addItem()">新增並同步</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script>
-const API = 'https://script.google.com/macros/s/AKfycbxYNGFaP11gsVeCCtMA9Ls14N3ox2mu5qnxQAcsGyoT3Bm4cHTiIV4CPxbGe3vn6auv/exec';
-
-// JSONP 方式讀取（解決 CORS）
-function fetchJsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = 'cb_' + Date.now();
-    const script = document.createElement('script');
-    script.src = url + '&callback=' + cb;
-    window[cb] = (data) => {
-      delete window[cb];
-      document.body.removeChild(script);
-      resolve(data);
-    };
-    script.onerror = () => {
-      delete window[cb];
-      document.body.removeChild(script);
-      reject(new Error('JSONP failed'));
-    };
-    document.body.appendChild(script);
-  });
-}
-
-async function syncNow() {
-  document.getElementById('syncStatus').textContent = '同步中...';
-  try {
-    const json = await fetchJsonp(API + '?action=read');
-    if (json.ok) {
-      allData = json.data;
-      renderAll();
-      const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-      document.getElementById('syncStatus').textContent = '最後同步：' + now;
-      showToast('✅ 行程已更新');
-    }
-  } catch(e) {
-    document.getElementById('syncStatus').textContent = '同步失敗，請重試';
-    showToast('❌ 無法連接，請確認網路');
-  }
-}
-
-async function pushData() {
-  document.getElementById('syncStatus').textContent = '儲存中...';
-  try {
-    // 寫入用 no-cors fetch（Apps Script 會收到）
-    await fetch(API, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'text/plain' },
-      body: JSON.stringify({ action: 'write', rows: allData })
-    });
-    const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('syncStatus').textContent = '已儲存：' + now;
-    showToast('✅ 已同步至 Google Sheets');
-  } catch(e) {
-    showToast('❌ 儲存失敗，請重試');
-  }
-}
-const DAYS = ['7月18日','7月19日','7月20日','7月21日','7月22日','7月23日','7月24日','7月25日'];
-const DAY_LABELS = ['7/18 六','7/19 日','7/20 一','7/21 二','7/22 三','7/23 四','7/24 五','7/25 六'];
-const DAY_HEADERS = [
-  '7月18日（六）・Day 1 抵達日','7月19日（日）・Day 2','7月20日（一）・海之日 🌊',
-  '7月21日（二）・Day 4','7月22日（三）・Day 5','7月23日（四）・Day 6',
-  '7月24日（五）・Day 7 天神祭','7月25日（六）・Day 8 返台'
-];
-const MEMBERS = ['5大→2大2小','5大2小','3大2小','2大2小','2大','3大'];
-
-let allData = [];
-let editingIdx = -1;
-let dragSrcIdx = -1;
-let dragSrcDay = '';
-let currentDay = 'd0';
-
-// ── UTILS ──
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.getElementById('nav-' + name).classList.add('active');
-  window.scrollTo(0,0);
-}
-function toggleCheck(el) {
-  el.querySelector('.check-circle').classList.toggle('done');
-  el.querySelector('.check-task').classList.toggle('done-text');
-}
-function speak(text) {
-  if ('speechSynthesis' in window) {
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'ja-JP'; u.rate = 0.85;
-    speechSynthesis.cancel(); speechSynthesis.speak(u);
-  }
-}
-function updateCountdown() {
-  const diff = Math.ceil((new Date('2026-07-18') - new Date()) / 86400000);
-  document.getElementById('countdown').textContent = diff > 0 ? diff+'天' : diff === 0 ? '出發！' : '旅途中';
-}
-
-// ── API ──
-async function syncNow() {
-  document.getElementById('syncStatus').textContent = '同步中...';
-  try {
-    const res = await fetch(API + '?action=read');
-    const json = await res.json();
-    if (json.ok) {
-      allData = json.data;
-      renderAll();
-      const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-      document.getElementById('syncStatus').textContent = '最後同步：' + now;
-      showToast('✅ 行程已更新');
-    }
-  } catch(e) {
-    document.getElementById('syncStatus').textContent = '同步失敗，請重試';
-    showToast('❌ 無法連接，請確認網路');
-  }
-}
-
-async function pushData() {
-  document.getElementById('syncStatus').textContent = '儲存中...';
-  try {
-    await fetch(API, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'write', rows: allData })
-    });
-    const now = new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
-    document.getElementById('syncStatus').textContent = '已儲存：' + now;
-    showToast('✅ 已同步至 Google Sheets');
-  } catch(e) {
-    showToast('❌ 儲存失敗，請重試');
-  }
-}
-
-// ── RENDER ──
-function getDateStr(row) {
-  const d = row['日期'];
-  if (!d) return '';
-  if (typeof d === 'string') {
-    // Handle ISO format: 2026-07-18T07:00:00.000Z
-    if (d.includes('T')) {
-      const dt = new Date(d);
-      // Use UTC+8 (JST/TST)
-      const m = dt.getUTCMonth() + 1;
-      const day = dt.getUTCDate();
-      // If time offset makes it cross day boundary, adjust
-      const h = dt.getUTCHours();
-      const adjusted = new Date(dt.getTime() + 7*3600000); // +7 to get ~JST
-      return (adjusted.getUTCMonth()+1) + '月' + adjusted.getUTCDate() + '日';
-    }
-    return d;
-  }
-  return String(d);
-}
-
-function fixTime(val) {
-  if (!val) return '';
-  if (typeof val === 'string') {
-    // Already formatted like 08:00-17:00 or 09:20-12:50
-    if (!val.includes('T') && !val.includes('1899')) return val;
-    // ISO time format: 1899-12-30T23:00:00.000Z -> convert to HH:MM
-    if (val.includes('1899') || val.includes('T')) {
-      const dt = new Date(val);
-      // Add 8 hours for UTC+8
-      const adjusted = new Date(dt.getTime() + 8*3600000);
-      const hh = adjusted.getUTCHours().toString().padStart(2,'0');
-      const mm = adjusted.getUTCMinutes().toString().padStart(2,'0');
-      return hh + ':' + mm;
-    }
-  }
-  return String(val);
-}
-
-function groupByDay() {
-  const groups = {};
-  DAYS.forEach(d => groups[d] = []);
-  allData.forEach((row, idx) => {
-    const ds = getDateStr(row);
-    const matchDay = DAYS.find(d => ds && ds.includes(d.replace('月','').replace('日','').split('').join('')));
-    // try matching by month+day number
-    let matched = false;
-    for (const d of DAYS) {
-      const m = d.match(/(\d+)月(\d+)日/);
-      if (m && ds) {
-        const pattern1 = m[1]+'/'+m[2];
-        const pattern2 = m[1]+'月'+m[2]+'日';
-        if (ds.includes(pattern1) || ds.includes(pattern2) || ds.includes(m[1]+'-'+m[2].padStart(2,'0'))) {
-          if (!groups[d]) groups[d] = [];
-          groups[d].push({ ...row, _origIdx: idx });
-          matched = true; break;
-        }
-      }
-    }
-    if (!matched) {
-      // fallback: try date object
-      const rawDate = row['日期'];
-      if (rawDate) {
-        try {
-          const dt = new Date(rawDate);
-          const m2 = dt.getMonth()+1, d2 = dt.getDate();
-          const key = DAYS.find(d => {
-            const mm = d.match(/(\d+)月(\d+)日/);
-            return mm && parseInt(mm[1])===m2 && parseInt(mm[2])===d2;
-          });
-          if (key) { groups[key].push({ ...row, _origIdx: idx }); }
-        } catch(e) {}
-      }
-    }
-  });
-  return groups;
-}
-
-function renderAll() {
-  renderTodayCard();
-  renderItinerary();
-}
-
-function renderTodayCard() {
-  const today = new Date();
-  const tripStart = new Date('2026-07-18');
-  const tripEnd = new Date('2026-07-25');
-  let dayIdx = 0;
-  if (today >= tripStart && today <= tripEnd) {
-    dayIdx = Math.floor((today - tripStart) / 86400000);
-  }
-  const dayKey = DAYS[dayIdx] || DAYS[0];
-  const groups = groupByDay();
-  const rows = groups[dayKey] || [];
-  const badge = 'Day ' + (dayIdx+1);
-  const label = DAY_LABELS[dayIdx] + '・' + (rows[0]?.['成員'] || '');
-  document.getElementById('todayBadge').textContent = badge;
-  document.getElementById('todayLabel').textContent = label;
-  const container = document.getElementById('todayItems');
-  if (rows.length === 0) {
-    container.innerHTML = '<div style="padding:14px 16px;font-size:12px;color:var(--hint)">同步後顯示今日行程</div>';
-    return;
-  }
-  container.innerHTML = rows.slice(0,4).map(r => `
-    <div class="today-item">
-      <div class="today-time">${fixTime(r['時間']||'')}</div>
-      <div><div class="today-name">${r['行程']||''}</div>
-      <div class="today-note">${(r['解說']||'').substring(0,30)}${(r['解說']||'').length>30?'...':''}</div></div>
-    </div>`).join('');
-}
-
-function renderItinerary() {
-  const groups = groupByDay();
-  // Selector
-  const sel = document.getElementById('daySelector');
-  sel.innerHTML = DAY_LABELS.map((l,i) => `
-    <div class="day-chip ${i===0?'active':''}" onclick="showDay('d${i}',this)">${l}</div>`).join('');
-  // Contents
-  const contents = document.getElementById('dayContents');
-  contents.innerHTML = DAYS.map((day, di) => {
-    const rows = groups[day] || [];
-    const memberBadge = rows[0]?.['成員'] || '';
-    return `
-    <div class="day-content ${di===0?'active':''}" id="d${di}">
-      <div class="day-header">
-        <div class="day-header-left">
-          <div class="date-big">${DAY_HEADERS[di]}</div>
-          ${memberBadge?`<span class="member-badge">${memberBadge}</span>`:''}
-        </div>
-        <button class="add-btn" onclick="openAddModal('${day}')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          新增
-        </button>
-      </div>
-      <div class="timeline" id="tl-${di}">
-        ${rows.length===0
-          ? '<div style="text-align:center;padding:24px;color:var(--hint);font-size:12px">尚無行程・點右上角新增</div>'
-          : rows.map((r,ri) => renderTlItem(r, di, ri)).join('')}
-      </div>
-    </div>`;
-  }).join('');
-  initDragAll();
-}
-
-function renderTlItem(r, di, ri) {
-  const name = r['行程'] || '';
-  const time = fixTime(r['時間'] || '');
-  const note = r['解說'] || '';
-  const items = r['要帶的物品'] || '';
-  const mapQ = encodeURIComponent(name.replace(/[【】A案B案・]/g,'').substring(0,20) + ' 大阪');
-  return `
-  <div class="tl-item" draggable="true" data-di="${di}" data-ri="${ri}" data-origidx="${r._origIdx}">
-    <div class="tl-dot hl" title="拖曳排序">≡</div>
-    <div class="tl-body">
-      <div class="tl-time">${time}</div>
-      <div class="tl-name">${name}</div>
-      ${items ? `<div class="tl-items-tag">🎒 ${items}</div>` : ''}
-      ${note ? `<div class="tl-note">${note}</div>` : ''}
-      <div class="tl-actions">
-        <a class="map-btn" href="https://maps.google.com/?q=${mapQ}" target="_blank">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>導航
-        </a>
-        <button class="edit-btn" onclick="openEdit(${r._origIdx})">✏️ 編輯</button>
-        <button class="del-btn" onclick="deleteItem(${r._origIdx})">🗑</button>
-      </div>
-    </div>
-  </div>`;
-}
-
-// ── DRAG & DROP ──
-function initDragAll() {
-  document.querySelectorAll('.tl-item').forEach(el => {
-    el.addEventListener('dragstart', e => {
-      dragSrcIdx = parseInt(el.dataset.origidx);
-      dragSrcDay = parseInt(el.dataset.di);
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    el.addEventListener('dragend', () => el.classList.remove('dragging'));
-    el.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect='move'; });
-    el.addEventListener('drop', e => {
-      e.preventDefault();
-      const targetIdx = parseInt(el.dataset.origidx);
-      if (dragSrcIdx === targetIdx) return;
-      // reorder in allData
-      const srcPos = allData.findIndex((_,i) => i === dragSrcIdx);
-      const tgtPos = allData.findIndex((_,i) => i === targetIdx);
-      const [moved] = allData.splice(srcPos, 1);
-      allData.splice(tgtPos, 0, moved);
-      renderItinerary();
-      pushData();
-    });
-  });
-}
-
-// ── EDIT MODAL ──
-function populateDaySelect(selId, currentDay) {
-  const sel = document.getElementById(selId);
-  sel.innerHTML = DAYS.map(d => `<option value="${d}" ${d===currentDay?'selected':''}>${d}</option>`).join('');
-}
-function openEdit(origIdx) {
-  editingIdx = origIdx;
-  const r = allData[origIdx];
-  const ds = getDateStr(r);
-  populateDaySelect('editDay', ds);
-  document.getElementById('editTime').value = r['時間'] || '';
-  document.getElementById('editName').value = r['行程'] || '';
-  document.getElementById('editMember').value = r['成員'] || '';
-  document.getElementById('editItems').value = r['要帶的物品'] || '';
-  document.getElementById('editNote').value = r['解說'] || '';
-  document.getElementById('modalTitle').textContent = '編輯行程';
-  document.getElementById('modalOverlay').classList.remove('hidden');
-}
-function closeModal() { document.getElementById('modalOverlay').classList.add('hidden'); }
-function saveItem() {
-  if (editingIdx < 0) return;
-  const newDay = document.getElementById('editDay').value;
-  // find weekday
-  const di = DAYS.indexOf(newDay);
-  const weekdays = ['六','日','一','二','三','四','五','六'];
-  allData[editingIdx]['日期'] = newDay;
-  allData[editingIdx]['星期'] = weekdays[di] || '';
-  allData[editingIdx]['時間'] = document.getElementById('editTime').value;
-  allData[editingIdx]['行程'] = document.getElementById('editName').value;
-  allData[editingIdx]['成員'] = document.getElementById('editMember').value;
-  allData[editingIdx]['要帶的物品'] = document.getElementById('editItems').value;
-  allData[editingIdx]['解說'] = document.getElementById('editNote').value;
-  closeModal();
-  renderAll();
-  pushData();
-}
-
-// ── ADD MODAL ──
-function openAddModal(day) {
-  populateDaySelect('addDay', day);
-  ['addWeekday','addTime','addName','addMember','addItems','addNote'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el.tagName === 'TEXTAREA' || el.type === 'text' || el.tagName === 'INPUT') el.value = '';
-  });
-  document.getElementById('addModalOverlay').classList.remove('hidden');
-}
-function closeAddModal() { document.getElementById('addModalOverlay').classList.add('hidden'); }
-function addItem() {
-  const newDay = document.getElementById('addDay').value;
-  const di = DAYS.indexOf(newDay);
-  const weekdays = ['六','日','一','二','三','四','五','六'];
-  const newRow = {
-    '日期': newDay,
-    '星期': weekdays[di] || '',
-    '成員': document.getElementById('addMember').value,
-    '時間': document.getElementById('addTime').value,
-    '行程': document.getElementById('addName').value,
-    '要帶的物品': document.getElementById('addItems').value,
-    '解說': document.getElementById('addNote').value,
-  };
-  // insert after last item of same day
-  const groups = groupByDay();
-  const dayItems = groups[newDay] || [];
-  if (dayItems.length > 0) {
-    const lastIdx = dayItems[dayItems.length-1]._origIdx;
-    allData.splice(lastIdx+1, 0, newRow);
-  } else {
-    allData.push(newRow);
-  }
-  closeAddModal();
-  renderAll();
-  pushData();
-}
-
-// ── DELETE ──
-function deleteItem(origIdx) {
-  if (!confirm('確定刪除這筆行程？')) return;
-  allData.splice(origIdx, 1);
-  renderAll();
-  pushData();
-}
-
-// ── SHOW DAY ──
-function showDay(dayId, el) {
-  document.querySelectorAll('.day-content').forEach(d => d.classList.remove('active'));
-  document.querySelectorAll('.day-chip').forEach(c => c.classList.remove('active'));
-  const dc = document.getElementById(dayId);
-  if (dc) dc.classList.add('active');
-  if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
-  currentDay = dayId;
-}
-
-// ── CHECKLIST ──
-let clDays = []; // 動態從 Sheets 欄位讀取
-let clData = [];
-let clChecked = JSON.parse(localStorage.getItem('clChecked') || '{}');
-
-// 固定欄位（不當天日期用）
-const CL_FIXED_COLS = ['類別','物品','說明','_row'];
-
-async function loadChecklist() {
-  try {
-    const json = await fetchJsonp(API + '?action=readItems');
-    if (json.ok) {
-      clData = json.data;
-      // 從 headers 動態抓日期欄（排除固定欄）
-      if (json.headers) {
-        clDays = json.headers
-          .filter(h => h && !CL_FIXED_COLS.includes(h))
-          .map((h, i) => ({ id: 'cl' + i, label: h, key: h }));
-      }
-      renderChecklist();
-    }
-  } catch(e) {
-    document.getElementById('clContent').innerHTML =
-      '<div style="text-align:center;padding:30px;color:var(--hint);font-size:12px">載入失敗，請同步後重試</div>';
-  }
-}
-
-function renderChecklist() {
-  if (clDays.length === 0) {
-    document.getElementById('clContent').innerHTML =
-      '<div style="text-align:center;padding:30px;color:var(--hint);font-size:12px">無資料，請確認 Google Sheets</div>';
-    return;
-  }
-
-  // Selector — 從 Sheets 欄位動態產生
-  const sel = document.getElementById('clDaySelector');
-  sel.innerHTML = clDays.map((d,i) =>
-    `<div class="day-chip ${i===0?'active':''}" onclick="showClDay('${d.id}',this)">${d.label}</div>`
-  ).join('');
-
-  // Contents
-  const content = document.getElementById('clContent');
-  content.innerHTML = clDays.map((day, di) => {
-    const dayItems = clData.filter(row => {
-      const val = row[day.key];
-      if (!val && val !== 0) return false;
-      const s = String(val).trim();
-      // ✓ counts; pure text notes (no ✓) don't count as required item
-      return s === '✓' || s.includes('✓');
-    });
-
-    const cats = {};
-    dayItems.forEach(row => {
-      const cat = row['類別'] || '其他';
-      if (!cats[cat]) cats[cat] = [];
-      cats[cat].push(row);
-    });
-
-    const totalItems = dayItems.length;
-    const checkedCount = dayItems.filter(row => clChecked[day.key + '_' + row['物品']]).length;
-
-    return `
-    <div class="cl-day-content ${di===0?'active':''}" id="${day.id}">
-      <div class="cl-progress">
-        <div class="cl-progress-label">
-          <span>${day.label} 攜帶物品</span>
-          <span id="cnt-${day.id}">${checkedCount} / ${totalItems} 件</span>
-        </div>
-        <div class="cl-progress-bar">
-          <div class="cl-progress-fill" id="bar-${day.id}"
-            style="width:${totalItems?Math.round(checkedCount/totalItems*100):0}%"></div>
-        </div>
-        <button class="cl-reset-btn" onclick="resetDay('${day.key}','${day.id}')">重置今日清單</button>
-      </div>
-      ${totalItems === 0
-        ? '<div style="text-align:center;padding:20px;color:var(--hint);font-size:12px">此天無攜帶物品紀錄</div>'
-        : Object.entries(cats).map(([cat, items]) => `
-        <div class="cl-category">
-          <div class="cl-cat-label">${cat}</div>
-          <div class="cl-card">
-            ${items.map(row => {
-              const key = day.key + '_' + row['物品'];
-              const checked = clChecked[key] ? 'done' : '';
-              const note = row['說明'] || '';
-              return `
-              <div class="cl-item" onclick="toggleCl('${key}','${day.id}',${totalItems},this)">
-                <div class="cl-check ${checked}"></div>
-                <div class="cl-info">
-                  <div class="cl-name ${checked?'done-text':''}">${row['物品']||''}</div>
-                  ${note ? `<div class="cl-note">${note}</div>` : ''}
-                  ${(row[day.key] && String(row[day.key]).trim() !== '✓' && String(row[day.key]).includes('✓')) ? `<div class="cl-note" style="color:var(--amber)">⚠️ ${String(row[day.key]).replace('✓','').trim()}</div>` : ''}
-                </div>
-              </div>`;
-            }).join('')}
+  <main class="app">
+    <section id="schedule" class="section active">
+      <div class="hero-grid">
+        <div class="weather">
+          <div class="city">OSAKA / KANSAI</div>
+          <div class="big">夏日行程</div>
+          <div class="subtitle" style="color:white">扶老攜幼版：每天留休息，不硬塞。</div>
+          <div class="meta">
+            <div class="mini">晴雨<br>看當日</div>
+            <div class="mini">高溫<br>補水</div>
+            <div class="mini">移動<br>保守</div>
           </div>
-        </div>`).join('')}
-    </div>`;
-  }).join('');
-}
+        </div>
+        <div class="countdown">
+          <div class="label">出發日</div>
+          <div class="days" id="countdownDays">--</div>
+          <div class="subtitle" style="color:white">2026 / 7 / 18</div>
+        </div>
+      </div>
 
-function toggleCl(key, dayId, total, el) {
-  clChecked[key] = !clChecked[key];
-  localStorage.setItem('clChecked', JSON.stringify(clChecked));
-  const check = el.querySelector('.cl-check');
-  const name = el.querySelector('.cl-name');
-  check.classList.toggle('done', clChecked[key]);
-  name.classList.toggle('done-text', clChecked[key]);
-  updateClProgress(dayId, total);
-}
+      <div class="date-strip" id="dateStrip"></div>
+      <div id="dayContent"></div>
+    </section>
 
-function updateClProgress(dayId, total) {
-  const day = CL_DAYS.find(d => d.id === dayId);
-  if (!day) return;
-  const dayItems = clData.filter(row => {
-    const val = row[day.key];
-    return val && String(val).includes('✓');
-  });
-  const checked = dayItems.filter(row => clChecked[day.key + '_' + row['物品']]).length;
-  const pct = total ? Math.round(checked/total*100) : 0;
-  const bar = document.getElementById('bar-' + dayId);
-  const cnt = document.getElementById('cnt-' + dayId);
-  if (bar) bar.style.width = pct + '%';
-  if (cnt) cnt.textContent = checked + ' / ' + total + ' 件';
-}
+    <section id="usj" class="section">
+      <div class="notice">7/21 USJ 組新版作戰表：早上先消化快通與期間限定，12:00 VIP 報到，12:30-15:30 Nintendo VIP，晚餐以 Kinopio Cafe 18:00 為目標。</div>
+      <div class="card">
+        <div class="day-title">
+          <h2>7/21 USJ 時間表</h2>
+          <span class="day-theme">5 人組</span>
+        </div>
+        <div class="timeline" id="usjTimeline"></div>
+      </div>
+      <div class="card">
+        <div class="day-title">
+          <h2>USJ 園區地圖</h2>
+          <span class="day-theme">路線參考</span>
+        </div>
+        <img class="map-img" src="assets/USJ_園區地圖_2026-07-21.png" alt="USJ 園區地圖">
+      </div>
+      <div class="info-grid">
+        <div class="card">
+          <h2>快通使用</h2>
+          <div class="timeline compact" id="expressList"></div>
+        </div>
+        <div class="card">
+          <h2>Plan B</h2>
+          <div class="timeline compact" id="planBList"></div>
+        </div>
+      </div>
+    </section>
 
-function resetDay(dayKey, dayId) {
-  if (!confirm('重置今日所有勾選？')) return;
-  Object.keys(clChecked).forEach(k => {
-    if (k.startsWith(dayKey + '_')) delete clChecked[k];
-  });
-  localStorage.setItem('clChecked', JSON.stringify(clChecked));
-  renderChecklist();
-  showClDay(dayId, document.querySelector('#clDaySelector .day-chip.active'));
-  showToast('✅ 已重置');
-}
+    <section id="weatherForecast" class="section">
+      <div class="info-grid">
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%B8%82" target="_blank" rel="noopener">
+          <strong>大阪市 / 難波</strong>
+          <span>7/18、7/20、7/22、7/24 市區行程</span>
+        </a>
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E7%99%BD%E5%B4%8E%E6%B5%B7%E6%B4%8B%E5%85%AC%E5%9C%92" target="_blank" rel="noopener">
+          <strong>白崎海洋公園</strong>
+          <span>7/19 自駕海岸線、由良町、湯淺方向</span>
+        </a>
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E3%83%A6%E3%83%8B%E3%83%90%E3%83%BC%E3%82%B5%E3%83%AB%E3%83%BB%E3%82%B9%E3%82%BF%E3%82%B8%E3%82%AA%E3%83%BB%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3" target="_blank" rel="noopener">
+          <strong>USJ / 此花區</strong>
+          <span>7/21 USJ 一整天，特別注意高溫、雨具、遊行</span>
+        </a>
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%AE%87%E6%B2%BB%E5%B8%82" target="_blank" rel="noopener">
+          <strong>宇治市</strong>
+          <span>7/23 宇治、平等院周邊、任天堂博物館</span>
+        </a>
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%A4%A9%E6%BA%80%E5%AE%AE" target="_blank" rel="noopener">
+          <strong>大阪天滿宮</strong>
+          <span>7/24 天神祭宵宮、天神橋筋商店街</span>
+        </a>
+        <a class="link-card" href="https://tenki.jp/search/?keyword=%E9%96%A2%E8%A5%BF%E5%9B%BD%E9%9A%9B%E7%A9%BA%E6%B8%AF" target="_blank" rel="noopener">
+          <strong>關西國際機場 KIX</strong>
+          <span>7/18 抵達、7/22 / 7/25 返台</span>
+        </a>
+      </div>
+      <div class="card">
+        <h2>每日天氣判斷</h2>
+        <div class="todo">
+          <label><input type="checkbox"> 前一晚確認隔天降雨機率與最高溫</label>
+          <label><input type="checkbox"> USJ / 天神祭日：確認午後雷雨與活動是否異動</label>
+          <label><input type="checkbox"> 自駕日：確認海岸線風雨、回程高速狀況</label>
+          <label><input type="checkbox"> 高溫日：補水、帽子、防曬、室內休息點優先</label>
+        </div>
+      </div>
+    </section>
 
-function showClDay(dayId, el) {
-  document.querySelectorAll('.cl-day-content').forEach(d => d.classList.remove('active'));
-  document.querySelectorAll('#clDaySelector .day-chip').forEach(c => c.classList.remove('active'));
-  const dc = document.getElementById(dayId);
-  if (dc) dc.classList.add('active');
-  if (el) { el.classList.add('active'); el.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); }
-}
+    <section id="planning" class="section">
+      <div class="card">
+        <h2>出發前準備</h2>
+        <div class="todo">
+          <label><input type="checkbox"> 護照、機票、住宿資訊、票券 QR code 截圖</label>
+          <label><input type="checkbox"> USJ App 登入、VIP QR、整理券與餐廳預約確認</label>
+          <label><input type="checkbox"> 兒童用品：水壺、濕紙巾、備用衣、薄外套、推車/背帶</label>
+          <label><input type="checkbox"> 自駕日：兒童座椅、ETC、導航、加油與還車時間</label>
+          <label><input type="checkbox"> 夏日裝備：防曬、帽子、行動電源、輕便雨具</label>
+          <label><input type="checkbox"> 常備藥：退燒、腸胃、暈車、OK 繃、防蚊</label>
+          <label><input type="checkbox"> 網路 / eSIM / 行動電源 / 充電線 / 轉接頭</label>
+        </div>
+      </div>
+      <div class="card">
+        <h2>每日出門前</h2>
+        <div class="todo">
+          <label><input type="checkbox"> 護照或證件、手機、錢包、交通卡</label>
+          <label><input type="checkbox"> 票券 QR code、餐廳預約、地圖截圖</label>
+          <label><input type="checkbox"> 水壺、濕紙巾、面紙、垃圾袋、小孩零食</label>
+          <label><input type="checkbox"> 防曬、帽子、毛巾、雨具或輕便外套</label>
+          <label><input type="checkbox"> 行動電源、充電線、藥品、備用衣</label>
+        </div>
+      </div>
+    </section>
 
-// Override showPage to load checklist on first visit
-const _origShowPage = showPage;
-let clLoaded = false;
-showPage = function(name) {
-  _origShowPage(name);
-  if (name === 'checklist' && !clLoaded) {
-    clLoaded = true;
-    loadChecklist();
-  }
-};
+    <section id="phrases" class="section">
+      <div class="card">
+        <h2>迷路 / 問路</h2>
+        <div class="timeline">
+          <div class="phrase"><div class="jp">すみません、ここはどこですか。</div><div class="zh">不好意思，請問這裡是哪裡？</div></div>
+          <div class="phrase"><div class="jp">この住所まで行きたいです。</div><div class="zh">我想去這個地址。</div></div>
+          <div class="phrase"><div class="jp">駅はどちらですか。</div><div class="zh">車站在哪個方向？</div></div>
+          <div class="phrase"><div class="jp">タクシー乗り場はどこですか。</div><div class="zh">計程車乘車處在哪裡？</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>買東西 / 詢價</h2>
+        <div class="timeline">
+          <div class="phrase"><div class="jp">これはいくらですか。</div><div class="zh">這個多少錢？</div></div>
+          <div class="phrase"><div class="jp">これをください。</div><div class="zh">我要這個。</div></div>
+          <div class="phrase"><div class="jp">袋をください。</div><div class="zh">請給我袋子。</div></div>
+          <div class="phrase"><div class="jp">免税できますか。</div><div class="zh">可以免稅嗎？</div></div>
+          <div class="phrase"><div class="jp">クレジットカードは使えますか。</div><div class="zh">可以刷信用卡嗎？</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>餐廳 / 人數</h2>
+        <div class="timeline">
+          <div class="phrase"><div class="jp">大人二人、子ども二人です。</div><div class="zh">兩位大人、兩位小孩。</div></div>
+          <div class="phrase"><div class="jp">七人です。</div><div class="zh">我們七位。</div></div>
+          <div class="phrase"><div class="jp">子ども用の椅子はありますか。</div><div class="zh">有兒童椅嗎？</div></div>
+          <div class="phrase"><div class="jp">予約しています。名前は〇〇です。</div><div class="zh">我們有預約，名字是〇〇。</div></div>
+          <div class="phrase"><div class="jp">お水をください。</div><div class="zh">請給我水。</div></div>
+        </div>
+      </div>
+    </section>
 
-// ── INIT ──
-updateCountdown();
-syncNow();
-</script>
+    <section id="members" class="section">
+      <div class="card">
+        <h2>成員航班與座位</h2>
+        <div class="timeline" id="memberList"></div>
+      </div>
+      <div class="booking-grid">
+        <div class="pass">
+          <div class="airline">CHINA AIRLINES</div>
+          <div class="flight">CI152</div>
+          <div class="route-row">
+            <div><div class="airport">TPE</div><div>09:00</div></div>
+            <div class="plane">→</div>
+            <div><div class="airport">KIX</div><div>12:50</div></div>
+          </div>
+          <div class="subline"><div>TPE T2</div><div>KIX T1</div></div>
+        </div>
+        <div class="pass">
+          <div class="airline">CHINA AIRLINES</div>
+          <div class="flight">CI153</div>
+          <div class="route-row">
+            <div><div class="airport">KIX</div><div>14:00</div></div>
+            <div class="plane">→</div>
+            <div><div class="airport">TPE</div><div>16:00</div></div>
+          </div>
+          <div class="subline"><div>KIX T1</div><div>TPE T2</div></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Made for Osaka Family Trip 2026｜更新版：總行程 + USJ 7/21 作戰表</div>
+  </main>
+
+  <nav class="tabs" aria-label="Bottom navigation">
+    <div class="tabs-inner">
+      <button class="tab active" data-tab="schedule">行程</button>
+      <button class="tab" data-tab="usj">USJ</button>
+      <button class="tab" data-tab="weatherForecast">天氣</button>
+      <button class="tab" data-tab="planning">準備</button>
+      <button class="tab" data-tab="phrases">日文</button>
+      <button class="tab" data-tab="members">成員</button>
+    </div>
+  </nav>
+
+  <script>
+    const days = [
+      { date: "7/18", week: "六", theme: "抵達大阪", items: [
+        ["09:00", "CI152 台北出發", "TPE T2", "Taiwan Taoyuan International Airport Terminal 2"],
+        ["12:50", "抵達 KIX T1", "已安排機場接送", "Kansai International Airport Terminal 1"],
+        ["16:00", "入住 Regale Namba", "大阪難波住宿", "Regale Namba Osaka"],
+        ["晚上", "難波附近晚餐、超市採買", "簡單吃、早點休息", "Namba Osaka supermarket"]
+      ]},
+      { date: "7/19", week: "日", theme: "白崎海洋公園自駕", items: [
+        ["08:00", "Toyota Namba 取車", "確認兒童座椅、ETC、導航", "Toyota Rent a Car Namba Osaka"],
+        ["08:20", "難波出發", "阪神高速、阪和道方向", "Namba Osaka"],
+        ["09:20", "岸和田 SA 或 紀之川 SA", "上廁所、買水、小孩活動", "Kishiwada Service Area"],
+        ["10:50", "白崎海洋公園", "白色石灰岩、海景步道、拍照", "Shirasaki Ocean Park"],
+        ["12:30", "由良町海鮮午餐", "海鮮丼、炸物、吻仔魚", "Yura Wakayama seafood restaurant"],
+        ["14:00", "戶津井鍾乳洞或海岸備案", "不想走就改海岸景點", "Totsui Limestone Cave"],
+        ["15:20", "湯淺老街", "醬油街、伴手禮、咖啡或冰淇淋", "Yuasa Traditional Townscape"],
+        ["16:30", "離開湯淺回大阪", "三連休不要拖晚", "Yuasa Wakayama"],
+        ["18:30", "難波附近加油", "還車前整理", "gas station near Namba Osaka"],
+        ["20:00", "Toyota Namba 還車", "不壓線", "Toyota Rent a Car Namba Osaka"]
+      ]},
+      { date: "7/20", week: "一", theme: "棒球日", items: [
+        ["上午", "大阪市區彈性 / 慢行", "保留體力", "Namba Osaka"],
+        ["13:00", "歐力士棒球", "京瓷巨蛋", "Kyocera Dome Osaka"],
+        ["晚上", "難波晚餐 / 回飯店", "依球賽結束時間調整", "Namba Osaka"]
+      ]},
+      { date: "7/21", week: "二", theme: "分組日", items: [
+        ["早上", "USJ 組 5 人出發", "另 2 位大人參加 KKday 天橋立 / 伊根一日遊", "Universal Studios Japan"],
+        ["07:30", "USJ 組抵達 USJ", "提早排隊等待開園", "Universal Studios Japan"],
+        ["12:00", "USJ VIP 報到", "固定", "Universal Studios Japan VIP Reception"],
+        ["12:30-15:30", "USJ VIP 導覽", "大白鯊、瑪利歐賽車、耀西冒險、咚奇剛瘋狂礦車", "Super Nintendo World Universal Studios Japan"],
+        ["16:15-16:55", "NO LIMIT! Parade", "若取消改 WaterWorld", "Universal Studios Japan"],
+        ["18:00", "Kinopio Cafe 晚餐", "目標預約時段", "Kinopio Cafe Universal Studios Japan"],
+        ["全天", "KKday 組：天橋立纜車 + 伊根遊船", "電子憑證免列印", "Amanohashidate Ine Kyoto"],
+        ["晚上", "各自回大阪 / 飯店會合", "回程時間依各行程實際狀況", "Regale Namba Osaka"]
+      ]},
+      { date: "7/22", week: "三", theme: "三位返台 / 休息補位", items: [
+        ["上午", "返台組前往 KIX", "建議 11:00 前出發", "Kansai International Airport Terminal 1"],
+        ["14:00", "CI153 KIX → TPE", "三位大人提前返台", "Kansai International Airport Terminal 1"],
+        ["下午", "留大阪組市區彈性", "不排硬行程、休息補位", "Namba Osaka"]
+      ]},
+      { date: "7/23", week: "四", theme: "宇治 / 任天堂博物館", items: [
+        ["上午", "大阪 → 宇治", "建議不要太早", "Uji Kyoto"],
+        ["中午", "宇治午餐、抹茶、平等院周邊", "依天氣與小孩狀態調整", "Byodoin Temple Uji"],
+        ["15:30-16:00", "任天堂博物館入場", "入場時段", "Nintendo Museum Uji"],
+        ["16:00-17:30", "任天堂博物館參觀", "建議至少抓 1.5 小時", "Nintendo Museum Uji"],
+        ["18:00 後", "近鐵小倉 → 大和西大寺 → 大阪難波", "大阪難波 - 大和西大寺可訂近鐵特急指定席", "Kintetsu Ogura Station"],
+        ["晚上", "回 Regale Namba", "難波晚餐或直接休息", "Regale Namba Osaka"]
+      ]},
+      { date: "7/24", week: "五", theme: "天神祭宵宮", items: [
+        ["上午", "Kids Plaza Osaka / 室內親子點", "避暑、讓小孩放電", "Kids Plaza Osaka"],
+        ["13:00", "天神橋筋商店街午餐", "接近大阪天滿宮", "Tenjinbashisuji Shopping Street"],
+        ["14:30-16:00", "回飯店休息 / 咖啡休息", "晚上才有體力", "Regale Namba Osaka"],
+        ["16:30", "前往大阪天滿宮", "感受祭典氣氛", "Osaka Tenmangu Shrine"],
+        ["17:00-18:30", "天神祭宵宮、商店街散步", "不硬擠最晚人潮", "Osaka Tenmangu Shrine"],
+        ["19:30", "回難波 / Regale Namba", "晚餐、整理行李", "Regale Namba Osaka"]
+      ]},
+      { date: "7/25", week: "六", theme: "返台", items: [
+        ["10:00", "Check-out", "Regale Namba", "Regale Namba Osaka"],
+        ["11:00", "前往 KIX", "預留托運、購物、退稅", "Kansai International Airport Terminal 1"],
+        ["14:00", "CI153 KIX → TPE", "16:00 抵達 TPE T2", "Kansai International Airport Terminal 1"]
+      ]}
+    ];
+
+    const usj = [
+      ["07:30", "抵達 USJ", "提早排隊等待開園", ""],
+      ["08:20", "入園", "直接前往哈利波特魔法世界", ""],
+      ["08:30", "哈利波特禁忌之旅", "使用快通；上午第一項", "fast"],
+      ["08:50", "鷹馬的飛行", "等待超過 30 分鐘就使用快通；30 分鐘內一般排隊", "fast"],
+      ["09:20", "哈利波特拍照、奶油啤酒", "園區拍照與短暫休息", ""],
+      ["09:40", "前往 Minion Park", "", ""],
+      ["09:50", "小小兵瘋狂乘車遊", "使用快通", "fast"],
+      ["10:15", "小小兵瘋狂任務～成為大壞蛋之路", "一般排隊", ""],
+      ["10:45", "名偵探柯南 4-D", "使用快通；上午完成，避免拖到晚間", "fast"],
+      ["11:10", "芙莉蓮 Story Walk", "若預估 11:40 前能完成就體驗；否則改到 17:00 後", "flex"],
+      ["11:50", "前往 VIP 集合", "預留移動時間", ""],
+      ["12:00", "VIP 報到", "固定", "fixed"],
+      ["12:30-15:30", "VIP 導覽", "固定；大白鯊、瑪利歐賽車、耀西冒險、咚奇剛瘋狂礦車", "fixed"],
+      ["15:30", "VIP 結束；預約 Kinopio Cafe", "目前規劃：成功預約 18:00；若沒有則改其他餐廳", ""],
+      ["15:35-16:00", "任天堂自由活動", "優先嘗試完成 2～3 個 Key Challenge；附近商品與小吃順便補買", ""],
+      ["16:00-16:10", "前往 NO LIMIT! Parade 觀賞位置", "", ""],
+      ["16:15-16:55", "NO LIMIT! Parade", "固定；若取消，改 WaterWorld", "fixed"],
+      ["17:00-17:50", "彈性時段", "優先補芙莉蓮 Story Walk；或太空幻想列車、其他想玩的設施", "flex"],
+      ["17:50", "Kinopio Cafe 報到", "提早 10 分鐘抵達", ""],
+      ["18:00", "Kinopio Cafe 晚餐", "加快用餐，保留晚間活動時間", ""],
+      ["19:00", "完成剩餘 Power-Up Band 活動", "Key Challenge → Bowser Jr. → 問號磚 → 任天堂夜景拍照", ""],
+      ["20:00", "煙火（若當日舉行）", "若取消：媽媽＋小朋友去 Wonderland；爸爸去咒術迴戰 4-D", "flex"],
+      ["21:00", "太空幻想列車", "暫定；接近 7/21 再依官方營運狀況決定", "flex"],
+      ["21:20-22:00", "自由安排", "Wonderland、其他想玩的設施、購物；依體力調整", ""]
+    ];
+
+    const express = [
+      ["哈利波特禁忌之旅", "使用快通"],
+      ["小小兵瘋狂乘車遊", "使用快通"],
+      ["名偵探柯南 4-D", "使用快通"],
+      ["鷹馬的飛行", "等待超過 30 分鐘才使用快通"],
+      ["太空幻想列車", "暫定；接近 7/21 再確認營運狀態"]
+    ];
+
+    const planB = [
+      ["鷹馬等待超過 30 分鐘", "直接使用快通"],
+      ["芙莉蓮上午來不及", "改到 17:00-17:50"],
+      ["Kinopio Cafe 沒有預約到", "改其他餐廳"],
+      ["NO LIMIT! Parade 取消", "改 WaterWorld"],
+      ["煙火取消", "媽媽＋小朋友去 Wonderland；爸爸去咒術迴戰 4-D"],
+      ["太空幻想列車仍暫停", "取消該項，改 Wonderland、其他設施或購物"]
+    ];
+
+    const members = [
+      { name: "Yichun Lin", outbound: "CI152 / 7/18 / 49E", inbound: "CI153 / 7/25 / 49E", pnr: "EIZ368" },
+      { name: "Tzuting Tseng", outbound: "CI152 / 7/18 / 48G", inbound: "CI153 / 7/25 / 48G", pnr: "EIZ368" },
+      { name: "Kaihsin Tseng", outbound: "CI152 / 7/18 / 49D", inbound: "CI153 / 7/25 / 49D", pnr: "EIZ368" },
+      { name: "Hsingyu Tseng", outbound: "CI152 / 7/18 / 49G", inbound: "CI153 / 7/25 / 49G", pnr: "EIZ368" },
+      { name: "Chinghung Lin", outbound: "CI152 / 7/18 / 49H", inbound: "CI153 / 7/22 / 15J", pnr: "EPSSHH" },
+      { name: "Chiunghung Sun", outbound: "CI152 / 7/18 / 49J", inbound: "CI153 / 7/22 / 15K", pnr: "EPSSHH" },
+      { name: "Yihui Lin", outbound: "CI152 / 7/18 / 49K", inbound: "CI153 / 7/22 / 16J", pnr: "EPSSHH" }
+    ];
+
+    function eventHtml(item) {
+      const [time, title, note, tag, mapQuery] = item;
+      const tagHtml = tag ? `<div class="chips"><span class="chip ${tag}">${tag === "fast" ? "快通" : tag === "fixed" ? "固定" : "彈性"}</span></div>` : "";
+      const mapHtml = mapQuery ? `<a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}" target="_blank" rel="noopener">Google Map</a>` : "";
+      return `<div class="event"><div class="time">${time}</div><div><h3>${title}</h3>${note ? `<p>${note}</p>` : ""}${tagHtml}${mapHtml}</div></div>`;
+    }
+
+    function renderDates() {
+      const strip = document.querySelector("#dateStrip");
+      strip.innerHTML = days.map((d, i) => `
+        <button class="date-btn ${i === 0 ? "active" : ""}" data-day="${i}">
+          <span class="day">DAY ${i + 1}</span>
+          <span class="date">${d.date.replace("7/", "7/")}</span>
+          <span class="day">${d.week}</span>
+        </button>
+      `).join("");
+      strip.addEventListener("click", (e) => {
+        const btn = e.target.closest(".date-btn");
+        if (!btn) return;
+        document.querySelectorAll(".date-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        renderDay(Number(btn.dataset.day));
+      });
+    }
+
+    function renderDay(index) {
+      const d = days[index];
+      document.querySelector("#dayContent").innerHTML = `
+        <div class="day-title">
+          <h2>${d.date}（${d.week}）</h2>
+          <span class="day-theme">${d.theme}</span>
+        </div>
+        <div class="card">
+          <div class="timeline">${d.items.map(eventHtml).join("")}</div>
+        </div>
+      `;
+    }
+
+    function renderSimpleList(selector, list) {
+      document.querySelector(selector).innerHTML = list.map(([a, b]) => eventHtml(["", a, b, ""])).join("");
+    }
+
+    function renderMembers() {
+      document.querySelector("#memberList").innerHTML = members.map((m) => `
+        <div class="event">
+          <div class="time">${m.pnr}</div>
+          <div>
+            <h3>${m.name}</h3>
+            <p>去程：${m.outbound}</p>
+            <p>回程：${m.inbound}</p>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function setupTabs() {
+      document.querySelector(".tabs-inner").addEventListener("click", (e) => {
+        const btn = e.target.closest(".tab");
+        if (!btn) return;
+        document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelector(`#${btn.dataset.tab}`).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    }
+
+    function setupCountdown() {
+      const start = new Date("2026-07-18T00:00:00+08:00");
+      const now = new Date();
+      const diff = Math.ceil((start - now) / 86400000);
+      document.querySelector("#countdownDays").textContent = diff > 0 ? `${diff} 天` : "出發中";
+    }
+
+    renderDates();
+    renderDay(0);
+    document.querySelector("#usjTimeline").innerHTML = usj.map(eventHtml).join("");
+    renderSimpleList("#expressList", express);
+    renderSimpleList("#planBList", planB);
+    renderMembers();
+    setupTabs();
+    setupCountdown();
+  </script>
 </body>
 </html>
