@@ -171,6 +171,42 @@
       font-weight: 850;
       line-height: 1.45;
     }
+    .weather-list {
+      display: grid;
+      gap: 12px;
+    }
+    .weather-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 15px;
+      border-radius: 16px;
+      background: var(--paper);
+      border: 1px solid #e8e3d5;
+      box-shadow: 3px 3px 0 #e8e6d9;
+    }
+    .weather-card strong {
+      display: block;
+      color: var(--teal);
+      font-size: 18px;
+      margin-bottom: 3px;
+    }
+    .weather-card .forecast {
+      color: var(--muted);
+      font-weight: 850;
+      line-height: 1.4;
+    }
+    .weather-card .weather-open {
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 8px 11px;
+      background: #e8f3f0;
+      color: #2f7d69;
+      font-size: 13px;
+      font-weight: 950;
+      white-space: nowrap;
+    }
     .tab.active {
       color: #4f843e;
       background: #e7f4df;
@@ -471,6 +507,8 @@
       .pass .flight { font-size: 30px; }
       .airport { font-size: 26px; }
       .tab { font-size: 10px; padding-left: 0; padding-right: 0; }
+      .weather-card { grid-template-columns: 1fr; }
+      .weather-card .weather-open { width: fit-content; }
     }
 
     @media print {
@@ -532,7 +570,7 @@
           <h2>USJ 園區地圖</h2>
           <span class="day-theme">路線參考</span>
         </div>
-        <img class="map-img" src="assets/USJ_園區地圖_2026-07-21.png" alt="USJ 園區地圖">
+        <img class="map-img" src="assets/USJ_園區地圖.png" alt="USJ 園區地圖">
       </div>
       <div class="info-grid">
         <div class="card">
@@ -547,31 +585,9 @@
     </section>
 
     <section id="weatherForecast" class="section">
-      <div class="info-grid">
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%B8%82" target="_blank" rel="noopener">
-          <strong>大阪市 / 難波</strong>
-          <span>7/18、7/20、7/22、7/24 市區行程</span>
-        </a>
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E7%99%BD%E5%B4%8E%E6%B5%B7%E6%B4%8B%E5%85%AC%E5%9C%92" target="_blank" rel="noopener">
-          <strong>白崎海洋公園</strong>
-          <span>7/19 自駕海岸線、由良町、湯淺方向</span>
-        </a>
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E3%83%A6%E3%83%8B%E3%83%90%E3%83%BC%E3%82%B5%E3%83%AB%E3%83%BB%E3%82%B9%E3%82%BF%E3%82%B8%E3%82%AA%E3%83%BB%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3" target="_blank" rel="noopener">
-          <strong>USJ / 此花區</strong>
-          <span>7/21 USJ 一整天，特別注意高溫、雨具、遊行</span>
-        </a>
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%AE%87%E6%B2%BB%E5%B8%82" target="_blank" rel="noopener">
-          <strong>宇治市</strong>
-          <span>7/23 宇治、平等院周邊、任天堂博物館</span>
-        </a>
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%A4%A9%E6%BA%80%E5%AE%AE" target="_blank" rel="noopener">
-          <strong>大阪天滿宮</strong>
-          <span>7/24 天神祭宵宮、天神橋筋商店街</span>
-        </a>
-        <a class="link-card" href="https://tenki.jp/search/?keyword=%E9%96%A2%E8%A5%BF%E5%9B%BD%E9%9A%9B%E7%A9%BA%E6%B8%AF" target="_blank" rel="noopener">
-          <strong>關西國際機場 KIX</strong>
-          <span>7/18 抵達、7/22 / 7/25 返台</span>
-        </a>
+      <div class="card">
+        <h2>天氣預報</h2>
+        <div class="weather-list" id="weatherList"></div>
       </div>
       <div class="card">
         <h2>每日天氣判斷</h2>
@@ -801,8 +817,20 @@
       { name: "Yihui Lin", outbound: "CI152 / 7/18 / 49K", inbound: "CI153 / 7/22 / 16J", pnr: "EPSSHH" }
     ];
 
+    const weatherPlaces = [
+      { name: "大阪市 / 難波", use: "7/18、7/20、7/22、7/24 市區行程", url: "https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%B8%82" },
+      { name: "白崎海洋公園", use: "7/19 自駕海岸線、由良町、湯淺方向", url: "https://tenki.jp/search/?keyword=%E7%99%BD%E5%B4%8E%E6%B5%B7%E6%B4%8B%E5%85%AC%E5%9C%92" },
+      { name: "USJ / 此花區", use: "7/21 USJ 一整天", url: "https://tenki.jp/search/?keyword=%E3%83%A6%E3%83%8B%E3%83%90%E3%83%BC%E3%82%B5%E3%83%AB%E3%83%BB%E3%82%B9%E3%82%BF%E3%82%B8%E3%82%AA%E3%83%BB%E3%82%B8%E3%83%A3%E3%83%91%E3%83%B3" },
+      { name: "宇治市", use: "7/23 宇治、平等院周邊、任天堂博物館", url: "https://tenki.jp/search/?keyword=%E5%AE%87%E6%B2%BB%E5%B8%82" },
+      { name: "大阪天滿宮", use: "7/24 天神祭宵宮、天神橋筋商店街", url: "https://tenki.jp/search/?keyword=%E5%A4%A7%E9%98%AA%E5%A4%A9%E6%BA%80%E5%AE%AE" },
+      { name: "關西國際機場 KIX", use: "7/18 抵達、7/22 / 7/25 返台", url: "https://tenki.jp/search/?keyword=%E9%96%A2%E8%A5%BF%E5%9B%BD%E9%9A%9B%E7%A9%BA%E6%B8%AF" }
+    ];
+
     function eventHtml(item) {
-      const [time, title, note, tag, mapQuery] = item;
+      const knownTags = ["fast", "fixed", "flex"];
+      const [time, title, note, fourth, fifth] = item;
+      const tag = knownTags.includes(fourth) ? fourth : "";
+      const mapQuery = knownTags.includes(fourth) ? fifth : fourth;
       const tagHtml = tag ? `<div class="chips"><span class="chip ${tag}">${tag === "fast" ? "快通" : tag === "fixed" ? "固定" : "彈性"}</span></div>` : "";
       const mapHtml = mapQuery ? `<a class="map-link" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQuery)}" target="_blank" rel="noopener">Google Map</a>` : "";
       return `<div class="event"><div class="time">${time}</div><div><h3>${title}</h3>${note ? `<p>${note}</p>` : ""}${tagHtml}${mapHtml}</div></div>`;
@@ -856,6 +884,40 @@
       `).join("");
     }
 
+    function renderWeatherCards() {
+      const list = document.querySelector("#weatherList");
+      list.innerHTML = weatherPlaces.map((place, index) => `
+        <div class="weather-card" data-weather-index="${index}">
+          <div>
+            <strong>${place.name}</strong>
+            <div class="forecast">${place.use}<br><span>讀取 tenki.jp 中...</span></div>
+          </div>
+          <a class="weather-open" href="${place.url}" target="_blank" rel="noopener">tenki.jp</a>
+        </div>
+      `).join("");
+    }
+
+    async function loadTenkiForecasts() {
+      const cards = Array.from(document.querySelectorAll("[data-weather-index]"));
+      await Promise.all(cards.map(async (card) => {
+        const place = weatherPlaces[Number(card.dataset.weatherIndex)];
+        const forecast = card.querySelector(".forecast span");
+        try {
+          const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(place.url)}`);
+          if (!response.ok) throw new Error("fetch failed");
+          const text = await response.text();
+          const clean = text
+            .split("\\n")
+            .map(line => line.trim())
+            .filter(Boolean)
+            .find(line => /天気|気温|降水|予報|tenki/.test(line) && line.length < 90);
+          forecast.textContent = clean || "點 tenki.jp 查看最新預報";
+        } catch (error) {
+          forecast.textContent = "點 tenki.jp 查看最新預報";
+        }
+      }));
+    }
+
     function setupTabs() {
       document.querySelector(".tabs-inner").addEventListener("click", (e) => {
         const btn = e.target.closest(".tab");
@@ -881,6 +943,8 @@
     renderSimpleList("#expressList", express);
     renderSimpleList("#planBList", planB);
     renderMembers();
+    renderWeatherCards();
+    loadTenkiForecasts();
     setupTabs();
     setupCountdown();
   </script>
