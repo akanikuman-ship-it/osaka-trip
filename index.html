@@ -352,12 +352,24 @@ a{ color:inherit; text-decoration:none; }
 
 /* 行程書 Print Book 預覽 */
 .print-controls{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+.book-chooser{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:18px; }
+.book-choice{ text-align:left; padding:15px 16px; border:1px solid var(--line); border-radius:12px; background:var(--card); cursor:pointer; color:var(--ink); box-shadow:var(--shadow); }
+.book-choice b{ display:block; font-family:var(--font-display); font-size:18px; margin-bottom:3px; }
+.book-choice small{ color:var(--ink-soft); line-height:1.45; }
+.book-choice.active{ border-color:var(--persimmon); box-shadow:0 0 0 2px rgba(193,89,43,.13); background:#fffaf2; }
+.pp-book-tag{ text-align:right; font-family:var(--font-mono); color:var(--persimmon-deep); font-weight:700; font-size:12px; }
+.pp-info-box{ margin:12px 0; padding:12px 14px; background:#f7f1e6; border-left:4px solid var(--gold); border-radius:6px; font-size:12px; line-height:1.7; }
+.phrase-table{ width:100%; border-collapse:collapse; font-size:12px; }
+.phrase-table td{ padding:7px 5px; border-bottom:1px dashed var(--line); vertical-align:top; }
+.phrase-table td:first-child{ width:42%; font-weight:700; }
+@media(max-width:760px){.book-chooser{grid-template-columns:1fr}}
 .print-preview{
   background:#fff; border:1px solid var(--card-edge); box-shadow:var(--shadow);
   padding:30px; max-width:720px; margin:0 auto; border-radius:8px;
 }
 .print-preview h2{ font-family:var(--font-display); text-align:center; font-size:22px; margin-bottom:4px; }
 .print-preview .pp-sub{ text-align:center; font-size:12px; color:var(--ink-soft); margin-bottom:20px; }
+.print-preview.book-catjack .pp-line,.print-preview.book-catjack .phrase-table{ font-size:13.5px; line-height:1.65; }
 .pp-day{ margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--line); }
 .pp-day h4{ font-family:var(--font-display); font-size:14.5px; margin-bottom:6px; }
 .pp-line{ font-size:11.5px; color:var(--ink); margin-bottom:2px; }
@@ -596,6 +608,11 @@ pre.data-dump{
         <button class="btn" onclick="doPrint('a5')">🖨 列印 A5</button>
         <span style="font-size:12px;color:var(--ink-soft);align-self:center;">只會列印下方行程書內容，側欄、地圖與按鈕會自動隱藏</span>
       </div>
+      <div class="book-chooser no-print">
+        <button class="book-choice active" data-book="ivy" onclick="selectBook('ivy')"><b>Ivy</b><small>USJ同行＋7/22陪同前往KIX</small></button>
+        <button class="book-choice" data-book="catjack" onclick="selectBook('catjack')"><b>Cat&amp;Jack</b><small>KKday天橋立・伊根＋旅遊會話</small></button>
+        <button class="book-choice" data-book="family" onclick="selectBook('family')"><b>麵米一家</b><small>親子完整行程＋麵麵想像中的旅行</small></button>
+      </div>
       <div class="print-preview" id="print-preview-content"></div>
     </section>
 
@@ -693,23 +710,23 @@ const tripData = {
       ]
     },
     {
-      day:4, date:'7/21', weekday:'二', theme:'方案日：天橋立 KKday／USJ 二選一',
+      day:4, date:'7/21', weekday:'二', theme:'分組日：KKday／USJ Plan A／Plan B',
       weatherCity:'大阪／京都',
       hasPlans:true,
       plans: [
         {
-          key:'A', label:'方案 A・KKday 天橋立/伊根一日遊',
+          key:'KKDAY', label:'KKday・天橋立／伊根一日遊',
           items:[
             {time:'06:30前', period:'上午', place:'Regale Namba 出發', note:'前往日本橋站（步行約 15-18 分／計程車約 5-10 分）', transport:'步行/計程車', confirmed:true},
             {time:'06:55', period:'上午', place:'日本橋站集合', note:'集合出口與領隊資訊以 KKday 憑證為準', transport:'遊覽車', confirmed:true},
-            {time:'上午', period:'上午', place:'前往天橋立 / 京都丹後方向', note:'車程較長，先上廁所、買水', transport:'遊覽車', confirmed:true},
+            {time:'上午', period:'上午', place:'前往天橋立方向', note:'車程較長，先上廁所、買水', transport:'遊覽車', confirmed:true},
             {time:'中午', period:'中午', place:'天橋立周邊午餐、散步', note:'依團體安排', transport:'徒步', confirmed:true},
             {time:'下午', period:'下午', place:'天橋立纜車 + 伊根舟屋 / 遊船', note:'行程順序以當日領隊為準', transport:'纜車/遊船', confirmed:true},
             {time:'晚上', period:'晚上', place:'返回大阪，飯店會合', note:'回程時間以 KKday 當日安排為準', transport:'遊覽車', confirmed:true},
           ]
         },
         {
-          key:'B', label:'方案 B・USJ 作戰日',
+          key:'USJA', label:'USJ Plan A・原作戰版',
           items:[
             {time:'07:30', period:'上午', place:'抵達 USJ，提早排隊', note:'5 人入園', transport:'電車', confirmed:true},
             {time:'08:30', period:'上午', place:'哈利波特禁忌之旅', note:'快速通關 1', transport:'園內步行', confirmed:true},
@@ -720,7 +737,26 @@ const tripData = {
             {time:'12:30-15:30', period:'下午', place:'Nintendo World VIP 導覽', note:'大白鯊、瑪利歐賽車、耀西冒險、咚奇剛', transport:'園內步行', confirmed:true},
             {time:'16:15-16:55', period:'下午', place:'NO LIMIT! Parade', note:'若取消改看 WaterWorld', transport:'園內步行', confirmed:false},
             {time:'18:00', period:'晚上', place:'Kinopio Cafe 晚餐', note:'目標預約時段', transport:'園內步行', confirmed:false},
-            {time:'晚上', period:'晚上', place:'Power-Up Band / 購物 / 彈性設施', note:'依體力調整', transport:'園內步行', confirmed:false},
+            {time:'19:00', period:'晚上', place:'Power-Up Band / 購物 / 彈性設施', note:'依體力與閉園時間調整', transport:'園內步行', confirmed:false},
+          ]
+        },
+        {
+          key:'USJB', label:'USJ Plan B・親子悠閒版',
+          items:[
+            {time:'07:30', period:'上午', place:'抵達 USJ，提早排隊', note:'3 大 2 小', transport:'電車', confirmed:true},
+            {time:'08:20', period:'上午', place:'入園並查看芙莉蓮 Timed Entry', note:'目標 10:00–11:30 或 17:00 後', transport:'園內步行', confirmed:false},
+            {time:'08:20-09:20', period:'上午', place:'哈利波特魔法世界', note:'麵＋2大玩禁忌之旅；米＋1大玩鷹馬，慢慢拍照', transport:'快速通關', confirmed:true},
+            {time:'09:40-10:40', period:'上午', place:'小小兵乘車遊＋瘋狂任務', note:'使用快速通關', transport:'園內步行', confirmed:true},
+            {time:'10:40', period:'上午', place:'芙莉蓮或名偵探柯南', note:'依預約時段調整', transport:'園內步行', confirmed:false},
+            {time:'11:30', period:'中午', place:'簡單補充食物', note:'VIP前先休息、補水', transport:'用餐', confirmed:false},
+            {time:'12:00', period:'中午', place:'VIP 報到', note:'攜帶5張完整票券，不只出示裁切QR Code', transport:'園內步行', confirmed:true},
+            {time:'12:30-15:30', period:'下午', place:'Nintendo World VIP 導覽', note:'依導覽內容與現場動線', transport:'VIP導覽', confirmed:true},
+            {time:'15:30', period:'下午', place:'VIP結束／Kinopio Cafe', note:'有預約就用餐，沒有則自由安排', transport:'園內步行', confirmed:false},
+            {time:'16:15', period:'下午', place:'NO LIMIT! Parade', note:'依官方當日演出為準', transport:'園內步行', confirmed:false},
+            {time:'17:00-18:00', period:'下午', place:'芙莉蓮／柯南／逛街休息', note:'彈性安排', transport:'園內步行', confirmed:false},
+            {time:'18:00', period:'晚上', place:'園區晚餐', note:'Kinopio或其他餐廳', transport:'用餐', confirmed:false},
+            {time:'19:00', period:'晚上', place:'任天堂自由活動', note:'Key Challenge、Bowser Jr.視體力', transport:'園內步行', confirmed:false},
+            {time:'20:00後', period:'晚上', place:'Wonderland／購物／彈性設施', note:'以當日21:00閉園公告為準', transport:'園內步行', confirmed:false},
           ]
         }
       ]
@@ -750,14 +786,17 @@ const tripData = {
       ]
     },
     {
-      day:6, date:'7/23', weekday:'四', theme:'宇治 / 任天堂博物館',
+      day:6, date:'7/23', weekday:'四', theme:'祇園祭後祭山鉾／任天堂博物館',
       weatherCity:'京都',
       items:[
-        {time:'上午', period:'上午', place:'大阪 → 宇治', note:'慢慢出發', transport:'電車', confirmed:false},
-        {time:'中午', period:'中午', place:'宇治午餐、抹茶、平等院周邊', note:'依天氣與小孩狀態調整', transport:'步行', confirmed:false},
-        {time:'15:30-16:00', period:'下午', place:'任天堂博物館入場', note:'入場時段（固定）', transport:'電車', confirmed:true},
-        {time:'16:00-17:30', period:'下午', place:'任天堂博物館參觀', note:'建議至少抓 1.5 小時', transport:'園內步行', confirmed:true},
-        {time:'18:00後', period:'晚上', place:'近鐵小倉 → 大和西大寺 → 大阪難波', note:'可考慮近鐵特急指定席', transport:'電車', confirmed:false},
+        {time:'08:30', period:'上午', place:'Regale Namba 出發前往烏丸御池', note:'保留體力，攜帶水與遮陽用品', transport:'電車', confirmed:false},
+        {time:'09:40-11:10', period:'上午', place:'祇園祭後祭山鉾散步', note:'烏丸御池→鈴鹿山→役行者山→北觀音山／南觀音山→大船鉾', transport:'步行', confirmed:false},
+        {time:'11:15-12:15', period:'中午', place:'四條烏丸午餐', note:'大丸京都店或SUINA室町，優先冷氣與座位', transport:'步行', confirmed:false},
+        {time:'12:50', period:'中午', place:'前往京都站', note:'四條站搭地鐵', transport:'電車', confirmed:false},
+        {time:'13:30', period:'下午', place:'近鐵京都站 → 小倉', note:'14:10左右抵達，先休息補水', transport:'近鐵', confirmed:false},
+        {time:'15:30', period:'下午', place:'任天堂博物館入場', note:'固定時段，預留身分確認時間', transport:'步行', confirmed:true},
+        {time:'15:30-18:00', period:'下午', place:'任天堂博物館參觀', note:'建議2至2.5小時', transport:'園內步行', confirmed:true},
+        {time:'18:00後', period:'晚上', place:'小倉 → 大和西大寺 → 大阪難波', note:'依體力直接回大阪', transport:'近鐵', confirmed:false},
       ]
     },
     {
@@ -916,6 +955,7 @@ function renderWeatherMini(){
    ================================================================ */
 let activeDayIndex = 0;
 const activePlanKey = {};   // 記錄每天目前選的方案（例如 day4 -> 'A'）
+let activeBook = 'ivy';
 
 function renderDayTabs(){
   const el = document.getElementById('day-tabs');
@@ -1153,30 +1193,66 @@ function deleteNote(i){
 /* ================================================================
    11. 行程書 Print Book
    ================================================================ */
+function selectBook(book){
+  activeBook = book;
+  document.querySelectorAll('.book-choice').forEach(b=>b.classList.toggle('active',b.dataset.book===book));
+  renderPrintBook();
+}
+function bookItems(d, book){
+  if(d.day===4){
+    if(book==='catjack') return [{label:'KKday・天橋立／伊根',items:d.plans.find(p=>p.key==='KKDAY').items}];
+    return d.plans.filter(p=>p.key==='USJA'||p.key==='USJB').map(p=>({label:p.label,items:p.items}));
+  }
+  if(d.day===5 && d.hasTracks){
+    const key=book==='family'?'stay':'return';
+    const t=d.tracks.find(x=>x.key===key); return [{label:t.label.replace('（3 位大人）',''),items:t.items}];
+  }
+  return [{label:'',items:d.items||[]}];
+}
 function renderPrintBook(){
   const el = document.getElementById('print-preview-content');
+  const config={
+    ivy:{name:'Ivy',range:[1,2,3,4,5],sub:'USJ同行・7/22陪同前往關西機場'},
+    catjack:{name:'Cat&Jack',range:[1,2,3,4,5],sub:'KKday天橋立／伊根・7/22返台'},
+    family:{name:'麵米一家',range:[1,2,3,4,5,6,7,8],sub:'親子完整旅程・USJ Plan A／Plan B'}
+  }[activeBook];
+  el.classList.toggle('book-catjack',activeBook==='catjack');
   let html = `
+    <div class="pp-book-tag">${config.name}</div>
     <h2>2026 大阪・關西家族旅行</h2>
-    <div class="pp-sub">2026/07/18 – 07/25 ・ 5 大 2 小 ・ 住宿：Regale Namba</div>
+    <div class="pp-sub">${config.sub} ・ 住宿：Regale Namba</div>
   `;
+  html += `<div class="pp-section-title">航班資訊</div>
+    <div class="pp-line"><b>去程 7/18（六）</b>CI152・09:00 TPE T2 → 12:50 KIX T1</div>
+    <div class="pp-line"><b>回程 ${activeBook==='family'?'7/25（六）':'7/22（三）'}</b>CI153・14:00 KIX → 16:00 TPE T2</div>`;
   html += `<div class="pp-section-title">每日行程</div>`;
-  tripData.days.forEach(d=>{
+  tripData.days.filter(d=>config.range.includes(d.day)).forEach(d=>{
     html += `<div class="pp-day"><h4>DAY ${d.day}｜${d.date}（${d.weekday}）${d.theme}</h4>`;
-    if(d.hasPlans){
-      d.plans.forEach(p=>{
-        html += `<div class="pp-line"><b>${p.label}</b></div>`;
-        p.items.forEach(it=> html += `<div class="pp-line"><b>${it.time}</b>${it.place}${it.note?'　'+it.note:''}</div>`);
-      });
-    } else if(d.hasTracks){
-      d.tracks.forEach(t=>{
-        html += `<div class="pp-line"><b>${t.label}</b></div>`;
-        t.items.forEach(it=> html += `<div class="pp-line"><b>${it.time}</b>${it.place}${it.note?'　'+it.note:''}</div>`);
-      });
-    } else {
-      d.items.forEach(it=> html += `<div class="pp-line"><b>${it.time}</b>${it.place}${it.note?'　'+it.note:''}</div>`);
-    }
+    bookItems(d,activeBook).forEach(group=>{
+      if(group.label) html += `<div class="pp-line"><b>${group.label}</b></div>`;
+      group.items.forEach(it=> html += `<div class="pp-line"><b>${it.time}</b>${it.place}${it.note?'　'+it.note:''}</div>`);
+    });
     html += `</div>`;
   });
+
+  if(activeBook==='ivy') html += `<div class="pp-section-title">7/22｜飯店 → 南海難波 → KIX</div>
+    <div class="pp-info-box"><b>建議路徑</b><br>Regale Namba → 搭計程車到「南海なんば駅」→ 依指標前往南海電鐵3樓北改札 → 搭特急 Rapi:t 前往「関西空港駅」→ 步行至 KIX T1。<br><b>建議：</b>約10:30離開飯店，最晚11:00前進站；三人帶行李以指定席Rapi:t較安心。</div>
+    <div class="pp-line"><b>購票方式</b>南海難波站粉紅色售票機／特急券窗口，或事先購買Rapi:t電子票並指定班次與座位。</div>
+    <div class="pp-line"><b>票種</b>Rapi:t需「乘車券＋特急券」；官方數位普通座目前成人¥1,410，車程最快約34分鐘。價格與班次以出發日官方公告為準。</div>
+    <div class="pp-line"><b>現場說法</b>関西空港まで、ラピートの指定席を3枚ください。</div>`;
+
+  if(activeBook==='catjack') html += `<div class="pp-section-title">旅行簡易會話</div>
+    <table class="phrase-table"><tr><td>請給我這個。</td><td>これをください。<br><small>Kore o kudasai.</small></td></tr>
+    <tr><td>兩位，有座位嗎？</td><td>二人ですが、席はありますか。<br><small>Futari desu ga, seki wa arimasu ka?</small></td></tr>
+    <tr><td>我們迷路了，可以帶我們到集合地點嗎？</td><td>道に迷いました。集合場所まで案内していただけますか。<br><small>Michi ni mayoimashita. Shūgō basho made annai shite itadakemasu ka?</small></td></tr>
+    <tr><td>我們不會說日文，請說慢一點。</td><td>日本語が話せません。ゆっくりお願いします。<br><small>Nihongo ga hanasemasen. Yukkuri onegaishimasu.</small></td></tr>
+    <tr><td>洗手間在哪裡？</td><td>トイレはどこですか。<br><small>Toire wa doko desu ka?</small></td></tr>
+    <tr><td>請幫我聯絡領隊。</td><td>添乗員に連絡してください。<br><small>Tenjōin ni renraku shite kudasai.</small></td></tr></table>`;
+
+  if(activeBook==='family') html += `<div class="pp-section-title">麵麵想像中的大阪旅行</div>
+    <div class="pp-info-box">想去飯店、看棒球與圖書館、吃幸福鬆餅和Rikuro老爺爺起司蛋糕；想去水族館、樂高樂園、寶可夢中心，也想在京都看任天堂博物館。<br><b>必要吃：</b>章魚燒（預想¥500–850）。買東西要用自己的錢，不要一次買太多。</div>
+    <div class="pp-line">□ 牙刷　□ 水壺　□ 日記　□ 一顆開心玩的心　□ 錢包　□ 衣服</div>
+    <div class="pp-line">□ 餐具　□ 小包包　□ 任天堂博物館門票　□ 背包　□ 相機</div>`;
 
   html += `<div class="pp-section-title">住宿資訊</div>
     <div class="pp-line">Regale Namba・入住 2026/07/18、退房 2026/07/25</div>`;
